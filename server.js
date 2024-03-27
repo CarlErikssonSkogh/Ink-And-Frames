@@ -5,10 +5,9 @@ const path = require("path");
 const bcrypt = require("bcryptjs");
 
 const app = express();
-app.set('view engine', 'hbs')
+app.set('views', path.join(__dirname, 'frontend'));
+app.set('view engine', 'hbs'); // Set Handlebars as the view engine
 dotenv.config({path: "./.env"});
-
-const publicDir = path.join(__dirname, './webbsidan')
 
 const db = mysql.createConnection({
     //värden hämtas från .env
@@ -33,3 +32,11 @@ db.connect((error) => {
 app.get("/", (req, res) => {
     res.render("index");
 });
+
+app.get("/register", (req, res) => {
+    res.render("register");
+});
+
+app.listen(4000, ()=> {
+    console.log("Servern körs, besök http://localhost:4000")
+})
