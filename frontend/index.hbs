@@ -9,7 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-<!--The header-->
+<!--The header, contains title, Menu, Searchbar and Login/Registration-->
 <header id = header>
     <div id ="title">
     <h1 id="titleText">title</h1>
@@ -24,15 +24,19 @@
         <button type="submit"><i class="fas fa-search"></i></button>
     </form>
 
-    <div id="auth">login</div> <!-- Or consider using a button element -->
-</header>
-    <nav>
-        <h4>Min fina sida</h4>
+    <nav id="auth">
         <ul>
-            <li><a href="/login">Logga in</a></li>
-            <li><a href="/register">Registrera</a></li>
+        <li id="signIn"><a href="/login">Sign in</a></li>
+        <li id="signUp"><a href="/register">Sign up</a></li>
         </ul>
     </nav>
+</header>
+
+<!--The main page with two sidebars-->
+<div class="container"> Main conmtainer</div>
+<div class = "leftCon"></div>
+<div class="main"></div>
+<div class = "rightCon"></div>
 
  
 </body>

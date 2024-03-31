@@ -3,6 +3,9 @@
     padding: 0;
 }
 
+ 
+/*The header*/
+
 h1 {
     margin: 0; /* Reset margin */
     padding: 0; /* Reset padding */
@@ -31,6 +34,7 @@ background-color: white;
 color: black;
 width: 80%;
 height: 80%;
+font-size: 5vh;
 border-radius: 10px;
 }
 
@@ -40,11 +44,12 @@ display: flex;
 align-items: center;
 justify-content: flex-start;
 height: 100%;
-font-size: 1.3rem;
+font-size: 3vh;
 gap: 5px;
 }
 .menu-text{
     font-weight: bold;
+    font-size: 3vh;
 }
 
 #search{
@@ -59,6 +64,7 @@ height: 100%;
 #searchbar{
     width: 80%;
     height: 50%;
+    font-size: 3vh;
 }
 
 #search button {
@@ -77,4 +83,43 @@ height: 100%;
 
 #auth{
 width: 20vw;
+font-size: 3vh;
+height: 100%;
 }
+
+#auth ul{
+    color: white;
+    text-decoration: none;
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1vw;
+    height: 100%;
+ }
+
+#auth li a{
+    color: white;
+    text-decoration: none;
+    list-style: none;
+ }
+
+ /*The main page*/
+ .container{
+background-color: red;
+height: 90vh;
+width: 100vw;
+ }
+
+ .leftCon{
+background-color: black;
+ }
+
+ .rightCon{
+
+ }
+
+ .main{
+
+ }
