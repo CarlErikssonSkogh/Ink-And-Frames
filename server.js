@@ -6,6 +6,7 @@ const bcrypt = require("bcryptjs");
 
 const app = express();
 app.set('views', path.join(__dirname, 'frontend'));
+app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'hbs'); // Set Handlebars as the view engine
 dotenv.config({path: "./.env"});
 

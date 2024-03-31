@@ -1,0 +1,10 @@
+.body{
+    background-color: blue;
+}
+#header{
+    background-color: rgb(0, 0, 0);
+    height:10vh;
+    width: 100%;
+    display:flex;
+    color: white;
+}
