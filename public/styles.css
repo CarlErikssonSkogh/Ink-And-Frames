@@ -1,6 +1,7 @@
-.body{
+body{
     margin: 0;
     padding: 0;
+    width: 100%;
 }
 
  
@@ -105,21 +106,102 @@ height: 100%;
     list-style: none;
  }
 
- /*The main page*/
- .container{
-background-color: red;
+/*The main page*/
+.mediaContainer{
 height: 90vh;
-width: 100vw;
+width: 100%;
+background-color: red;
+display: flex;
+flex-direction: row;
+}
+
+.leftCon{
+background-color: rgb(255, 255, 255);
+width: 10%;
+height: 100%;
+display: flex;
+justify-content: flex-start;
+flex-direction: column;
+}
+
+.ink1{
+    width: 100%;
+    height: 30%;
+    object-fit: contain;
+    position: relative;
+    bottom: -2vh;
+    transform: rotate(15deg);
+    left: -2vw;
+}
+
+.ink2{
+    width: 100%;
+    height: 40%;
+    object-fit: contain;
+    position: relative;
+    bottom: -3.2vh;
+    transform: scaleY(-1);
+    transform: rotate(-160deg);
+    
+}
+
+.rightCon{
+background-color: rgb(255, 255, 255);
+width: 10%;
+height: 100%;
+position: relative;
+overflow-x: hidden;
+overflow-y: hidden;
  }
 
- .leftCon{
-background-color: black;
+ .frame{
+    height: 20%;
+    position: absolute;
+    transform: rotate(-20deg);
+    right: 10%;
+    bottom: 80%;
+ }
+ .frame2{
+    height: 20%;
+    transform: rotate(20deg);
+    position: absolute;
+    bottom: 58%;
+ }
+ .frame3{
+    height: 20%;
+    transform: rotate(-30deg);
+    position: absolute;
+    right: 15%;
+    bottom: 35%;
+ }
+ .frame4{
+    height: 20%;
+    transform: rotate(40deg);
+    position: absolute;
+    bottom: 10%;
+    right: 10%;
+ }
+ z
+
+ .film2{
+    height: 23%;
+    position: absolute;
+    left: -1.7vw;
+    bottom:70%;
  }
 
- .rightCon{
-
+.main{
+background-color: rgb(0, 0, 0);
+width:80%;
+height: 100%;
+display: flex;
+justify-content: center;
+align-items: flex-start;
  }
 
- .main{
-
+ #media1{
+    margin: 4vh;
+    height: 20%;
+    width: 80%;
+    background-color: white;
  }
