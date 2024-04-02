@@ -30,7 +30,22 @@ db.connect((error) => {
 
 // Använder mallen index.hbs
 app.get("/", (req, res) => {
-    res.render("index");
+        //Använder sql kod för att selecta name och email där name = det angivna namnet och email = den angivna emailen
+        db.query('SELECT MediaID, Title, AvgRating, Description, tag FROM media', (error, result) => {
+        if(error){
+            console.log(error)
+        }else{
+            result.forEach(result => {
+                res.render("index",{
+                    title: result.Title,
+                    avgRating: result.AvgRating,
+                    description: result.Description,
+                    tag: result.tag
+                });
+            });
+        }
+    })
+
 });
 
 app.get("/register", (req, res) => {

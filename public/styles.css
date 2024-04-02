@@ -22,6 +22,7 @@ h1 {
     text-align: center;
     justify-content: center; /* Horizontally center the content */
     align-items: center; /* Vertically center the content */
+    border-bottom: 2px solid rgb(71, 71, 71);
 }
 
 #title{
@@ -122,6 +123,7 @@ height: 100%;
 display: flex;
 justify-content: flex-start;
 flex-direction: column;
+border-right: 3px solid rgb(71, 71, 71);
 }
 
 .ink1{
@@ -152,6 +154,7 @@ height: 100%;
 position: relative;
 overflow-x: hidden;
 overflow-y: hidden;
+border-left: 3px solid rgb(71, 71, 71);
  }
 
  .frame{
@@ -195,13 +198,45 @@ background-color: rgb(0, 0, 0);
 width:80%;
 height: 100%;
 display: flex;
-justify-content: center;
+justify-content: flex-start;
 align-items: flex-start;
+flex-direction: row;
+overflow-x: auto; /* Enable horizontal scrolling */
+white-space: nowrap;
  }
 
  #media1{
-    margin: 4vh;
-    height: 20%;
-    width: 80%;
-    background-color: white;
+    flex: 0 0 auto; /* Prevent items from stretching */
+    margin: 1%;
+    height: 65vh;
+    width: 18%;
+    background-color: rgb(43, 43, 43);
+    display: flex;
+    flex-direction: column;
+    border-radius:1vh;
  }
+
+ #mediac1Img{
+    height: 60%;
+ }
+
+ #media1InfoContainer{
+    height: 100%;
+    width: 20%;
+    width: 100%;
+ }
+
+ #media1InfoContainer h1{
+    color: white;
+    font-size: 3vh;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+ }
+
+ #media1InfoContainer h1 img{
+height: 12.5%;
+width: 12.5%;
+margin: 0;
+align-self: flex-end;
+}
