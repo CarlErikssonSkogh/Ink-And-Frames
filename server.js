@@ -28,24 +28,25 @@ db.connect((error) => {
     }
 });
 
-// Använder mallen index.hbs
+//looks for the index.hbs file in the frontend folder
 app.get("/", (req, res) => {
-        //Använder sql kod för att selecta name och email där name = det angivna namnet och email = den angivna emailen
-        db.query('SELECT MediaID, Title, AvgRating, Description, tag FROM media', (error, result) => {
-        if(error){
-            console.log(error)
-        }else{
-            result.forEach(result => {
-                res.render("index",{
-                    title: result.Title,
-                    avgRating: result.AvgRating,
-                    description: result.Description,
-                    tag: result.tag
-                });
-            });
+    //Query the database for all movies
+    db.query('SELECT MediaID, Title, AvgRating, Description, tag FROM media', (error, result) => {
+        if (error) {
+            console.log(error);
+            res.status(500).send("Error retrieving data from database");
+        } else {
+            //Map the results to an array of objects
+            const mediaData = result.map(item => ({
+                title: item.Title,
+                avgRating: item.AvgRating,
+                description: item.Description,
+                tag: item.tag
+            }));
+            //Render the index.hbs with the data
+            res.render("index", { mediaData: mediaData });
         }
-    })
-
+    });
 });
 
 app.get("/register", (req, res) => {

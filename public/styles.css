@@ -216,23 +216,20 @@ white-space: nowrap;
     border-radius:1vh;
  }
 
- #mediac1Img{
-    height: 60%;
- }
-
  #media1InfoContainer{
     height: 100%;
     width: 20%;
     width: 100%;
  }
 
- #media1InfoContainer h1{
+ #media1 h1{
+    margin: 1vh;
     color: white;
     font-size: 3vh;
     display: flex;
     flex-direction: row;
     width: 100%;
- }
+}
 
  #media1InfoContainer h1 img{
 height: 12.5%;
