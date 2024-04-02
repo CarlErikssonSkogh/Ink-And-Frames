@@ -49,10 +49,45 @@ app.get("/", (req, res) => {
     });
 });
 
-app.get("/register", (req, res) => {
-    res.render("register");
+app.get("/signUp", (req, res) => {
+    res.render("signUp");
 });
 
+app.get("/signIn", (req, res) => {
+    res.render("signIn");
+});
+
+app.post("/signUp", (req, res) => {
+
+});
+
+app.post("/signIn", (req, res) => {
+    const { name, password } = req.body
+    db.query('SELECT Username, Password FROM users WHERE Username = ?', [name], async (error, result) => {
+        if(error){
+            console.log(error)
+        }
+        // Om == 0 så finns inte användaren
+        if( result.length == 0 ) {
+            return res.render('login', {
+                message: "Användaren finns ej"
+            }) 
+
+        } else {
+            //Vi kollar om lösenordet som är angivet matchar det i databasen
+            bcrypt.compare(password, result[0].password, function(err, isMatch) {
+                if (isMatch) {
+                    //password is valid
+                    return res.render('index', {
+                    })
+                }else{
+                    //password is not valid
+                    res.render("signIn");
+                }
+            });
+        }
+    })
+});
 
 app.get('/search', (req, res) => {
     const query = req.query.query; // Retrieve the search query from the query parameters

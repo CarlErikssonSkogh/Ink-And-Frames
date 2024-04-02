@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" type="text/css" href="/styles.css">
+    <title>Login/Register</title>
+</head>
+<body style="display: flex; justify-content:center; align-items:center; height:100vh;">
+    <div class="authCon">
+        <form id="authForm" action="signUp" method="POST" onsubmit="return password_check('submit')">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="name-reg" name="name" placeholder="Username" required>                        
+                    </div>
+                    <div class="mb-3">
+                        <!--checkar så att det är en korrekt email adress-->
+                        <input type="email" class="form-control" id="email-reg" name="email"  placeholder="Email" required>                        
+                    </div>
+                    <div class="mb-3">
+                        <!--kallar password_check varje gång en knapp släpps-->
+                        <input type="password" class="form-control" id="password-reg" name="password" onkeyup="password_check()"  placeholder="Password" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="password" class="form-control" id="password-conf-reg" name="password_confirm" onkeyup="password_check()" placeholder="Confirm passowrd" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Sign up</button>
+                </form>
+    </div>
+<script>
+//Function to check if the password is correctly written and if it matches in both forms
+function password_check(input){
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    const password_reg = document.getElementById("password-reg");
+    const password_conf_reg = document.getElementById("password-conf-reg");
+        //Checks if password is correctly written
+
+        if(input=="submit"){
+        if (!passwordRegex.test(password_reg.value)){
+            alert("Lösenord måste inehålla minst 8 tecken, minst en bokstav och siffra");
+            return false;
+        }
+        }
+        /*Checks whether both passwords match by alternating the color between green and red. If It's called thorugh the 
+        submit button, it instead provides the user with an alert if the passwords don't match.*/
+        if (password_reg.value == password_conf_reg.value){
+            console.log("test")
+            password_conf_reg.style.color = "green";
+            if(input == "submit"){
+                return true;
+            }
+        } else{
+            password_conf_reg.style.color = "red";
+            console.log("test2")
+            if(input=="submit"){
+                alert("Lösenorden matcher inte");
+            }
+            return false;
+        }
+        }
+</script>
+</body>
+</html>
