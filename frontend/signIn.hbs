@@ -9,6 +9,9 @@
 <body style="display: flex; justify-content:center; align-items:center; height:100vh;">
     <div class="authCon">
         <form id="authForm" action="signIn" method="POST" onsubmit="return password_check('submit')">
+            {{#if message }}
+                <h4 class="message">{{message}}</h4>
+            {{/if}}
                     <div class="mb-3">
                         <input type="text" class="form-control" id="name-reg" name="name" placeholder="Username" required>                        
                     </div>

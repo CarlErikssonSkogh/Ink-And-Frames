@@ -3,6 +3,7 @@ const mysql = require("mysql2");
 const dotenv = require("dotenv");
 const path = require("path");
 const bcrypt = require("bcryptjs");
+var session = require('express-session')
 
 const app = express();
 app.set('views', path.join(__dirname, 'frontend'));
@@ -17,6 +18,14 @@ const db = mysql.createConnection({
     database: process.env.DATABASE
 });
 
+app.set('trust proxy', 1) // trust first proxy
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }
+}))
+
 app.use(express.urlencoded({extended: 'false'}))
 app.use(express.json())
 
@@ -27,6 +36,7 @@ db.connect((error) => {
         console.log("Ansluten till MySQL");
     }
 });
+
 
 //looks for the index.hbs file in the frontend folder
 app.get("/", (req, res) => {
@@ -57,10 +67,78 @@ app.get("/signIn", (req, res) => {
     res.render("signIn");
 });
 
+/*Handles sign up */
 app.post("/signUp", (req, res) => {
+    console.log("submitted")
+    //Variabel för hur ett korrekt lösenord ska se ut
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
+    //Variabel för hur korrekt email ska se ut
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    const{name, email, password, password_confirm} = req.body
+
+    //kollar om lösenordet är korrekt skrivet
+    if(!passwordRegex.test(password)){
+        return res.render('signUp', {
+            message: "Password must contain atleasy 8 characters, atleast one number and one letter"
+        })
+    }
+
+    //testar om den angivna emailen är korrekt
+    if (!emailRegex.test(email)){
+        return res.render('signUp', {
+            message: "Not a correct email"
+        })
+    }
+
+    //kollar om password är matchande
+    if (password != password_confirm){
+        return res.render('signUp', {
+            message: "Passwords do not match"
+        })
+    }
+
+    //Om inte alla fälten är i fyllda
+    if (!name || !email || !password || !password_confirm){
+        return res.render('signUp', {
+            message: "All fields are not filled out"
+        })
+    }
+
+    db.query('SELECT Username, Email FROM users WHERE Username = ? or Email = ?', [name, email], (error, result) => {
+        if(error){
+            console.log(error)
+        }
+        //Om == 0 så finns inte användaren
+        if( result.length != 0 ) {
+            return res.render('signUp', {
+                message: "User alaredy exists"
+            }) 
+        } else{
+
+            //krypterar lösenordet
+            cryptPassword(password, (err, hash)=>{
+                if(err){
+                    console.log("An error occured")
+                }else{
+                //Lägger till användare med det krypterade lösenordet
+                db.query('INSERT INTO users SET?', {Username: name, Email: email, Password: hash}, (err, result) => {
+                    if(err) {
+                        console.log(err)
+                    } else {
+                        return res.render('signUp', {
+                            message: 'User registered'
+                        })
+                    }       
+            })
+                }
+            });
+        }
+    })
 });
 
+
+/*Handles sign in */
 app.post("/signIn", (req, res) => {
     const { name, password } = req.body
     db.query('SELECT Username, Password FROM users WHERE Username = ?', [name], async (error, result) => {
@@ -69,21 +147,28 @@ app.post("/signIn", (req, res) => {
         }
         // Om == 0 så finns inte användaren
         if( result.length == 0 ) {
-            return res.render('login', {
+            return res.render('signIn', {
                 message: "Användaren finns ej"
             }) 
 
         } else {
             //Vi kollar om lösenordet som är angivet matchar det i databasen
-            bcrypt.compare(password, result[0].password, function(err, isMatch) {
+            bcrypt.compare(password, result[0].Password, function(err, isMatch) {
                 if (isMatch) {
                     //password is valid
+                    app.use(session({
+                        genid: function(req) {
+                          return genuuid() // use UUIDs for session IDs
+                        },
+                        secret: 'keyboard cat'
+                      }))
                     return res.render('index', {
                     })
-                }else{
-                    //password is not valid
-                    res.render("signIn");
-                }
+                }else   
+                console.log("fel lösenord")                 
+                return res.render('signIn', {
+                    message: "Fel lösenord"
+                })
             });
         }
     })
@@ -101,6 +186,16 @@ app.get('/search', (req, res) => {
 app.listen(4000, ()=> {
     console.log("Servern körs, besök http://localhost:4000")
 })
+
+//Krypterar lösenordet
+function cryptPassword(password, callback){
+    bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(password, salt, function(err, hash) {
+        callback(err, hash)
+        });
+        
+    })
+}
 
 
 /*How to handle the search later

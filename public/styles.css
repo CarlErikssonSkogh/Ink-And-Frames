@@ -270,3 +270,15 @@ align-self: flex-end;
     gap: 2vh;
     flex-direction: column;
 }
+
+.message{
+    position:absolute;
+    top: 30vh;
+    display: flex;
+    justify-self: center;
+    align-self: center;
+    justify-content: center;
+    width: 25vw;
+    height: 3vh;
+    background-color: rgb(255, 0, 0);
+}

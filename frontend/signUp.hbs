@@ -9,6 +9,9 @@
 <body style="display: flex; justify-content:center; align-items:center; height:100vh;">
     <div class="authCon">
         <form id="authForm" action="signUp" method="POST" onsubmit="return password_check('submit')">
+            {{#if message }}
+                <h4 class="message">{{message}}</h4>
+            {{/if}}
                     <div class="mb-3">
                         <input type="text" class="form-control" id="name-reg" name="name" placeholder="Username" required>                        
                     </div>
@@ -21,7 +24,7 @@
                         <input type="password" class="form-control" id="password-reg" name="password" onkeyup="password_check()"  placeholder="Password" required>
                     </div>
                     <div class="mb-3">
-                        <input type="password" class="form-control" id="password-conf-reg" name="password_confirm" onkeyup="password_check()" placeholder="Confirm passowrd" required>
+                        <input type="password" class="form-control" id="password-conf-reg" name="password_confirm" onkeyup="password_check()" placeholder="Confirm password" required>
                     </div>
 
                     <button type="submit" class="btn btn-primary">Sign up</button>
@@ -30,6 +33,7 @@
 <script>
 //Function to check if the password is correctly written and if it matches in both forms
 function password_check(input){
+    
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
     const password_reg = document.getElementById("password-reg");
     const password_conf_reg = document.getElementById("password-conf-reg");
