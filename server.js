@@ -4,12 +4,14 @@ const dotenv = require("dotenv");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 var session = require('express-session')
+const MySQLStore = require('express-mysql-session')(session);
 
 const app = express();
 app.set('views', path.join(__dirname, 'frontend'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'hbs'); // Set Handlebars as the view engine
 dotenv.config({path: "./.env"});
+
 const db = mysql.createConnection({
     //värden hämtas från .env
     host: process.env.DATABASE_HOST,
@@ -18,13 +20,28 @@ const db = mysql.createConnection({
     database: process.env.DATABASE
 });
 
+const sessionStore = new MySQLStore({
+    host: process.env.DATABASE_HOST,
+    user: process.env.DATABASE_USER,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE
+});
+
 app.set('trust proxy', 1) // trust first proxy
 app.use(session({
-  secret: 'keyboard cat',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: true }
+    store: sessionStore,
+    secret: 'keyboard duck',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
 }))
+
+//Middleware to add user and authentication status to all responses
+app.use((req, res, next) => {
+    res.locals.user = req.session.user;
+    res.locals.isAuthenticated = req.session.user !== undefined;
+    next();
+  });
 
 app.use(express.urlencoded({extended: 'false'}))
 app.use(express.json())
@@ -37,7 +54,7 @@ db.connect((error) => {
     }
 });
 
-
+let mediaData= []
 //looks for the index.hbs file in the frontend folder
 app.get("/", (req, res) => {
     //Query the database for all movies
@@ -47,29 +64,31 @@ app.get("/", (req, res) => {
             res.status(500).send("Error retrieving data from database");
         } else {
             //Map the results to an array of objects
-            const mediaData = result.map(item => ({
+            mediaData = result.map(item => ({
                 title: item.Title,
                 avgRating: item.AvgRating,
                 description: item.Description,
                 tag: item.tag
             }));
-            //Render the index.hbs with the data
-            res.render("index", { mediaData: mediaData });
+            //Render the index.hbs with the data and isAuthenticated variable
+            res.render('index', { mediaData: mediaData });
         }
     });
 });
 
+
+//renders signUp
 app.get("/signUp", (req, res) => {
     res.render("signUp");
 });
 
+//renders signIn
 app.get("/signIn", (req, res) => {
     res.render("signIn");
 });
 
 /*Handles sign up */
 app.post("/signUp", (req, res) => {
-    console.log("submitted")
     //Variabel för hur ett korrekt lösenord ska se ut
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
@@ -141,7 +160,7 @@ app.post("/signUp", (req, res) => {
 /*Handles sign in */
 app.post("/signIn", (req, res) => {
     const { name, password } = req.body
-    db.query('SELECT Username, Password FROM users WHERE Username = ?', [name], async (error, result) => {
+    db.query('SELECT PersonID, Username, Password FROM users WHERE Username = ?', [name], async (error, result) => {
         if(error){
             console.log(error)
         }
@@ -156,14 +175,9 @@ app.post("/signIn", (req, res) => {
             bcrypt.compare(password, result[0].Password, function(err, isMatch) {
                 if (isMatch) {
                     //password is valid
-                    app.use(session({
-                        genid: function(req) {
-                          return genuuid() // use UUIDs for session IDs
-                        },
-                        secret: 'keyboard cat'
-                      }))
-                    return res.render('index', {
-                    })
+                    // Store user information in the session
+                    req.session.user = result[0];
+                    return res.redirect('/');
                 }else   
                 console.log("fel lösenord")                 
                 return res.render('signIn', {
@@ -183,6 +197,19 @@ app.get('/search', (req, res) => {
     res.send(responseText);
 });
 
+
+//renders media
+app.get("/media", (req, res) => {
+    //retrieves mediaName variable from the url
+    const mediaName = req.query.name;
+    //Filter the mediaData array for the media with the given mediaName
+    console.log("data",mediaData)
+    const mediaItem = mediaData.find(item => item.title === mediaName);
+    console.log("data",mediaItem)
+    //Render the media.hbs with the data
+    res.render('media', { mediaItem: mediaItem });
+});
+
 app.listen(4000, ()=> {
     console.log("Servern körs, besök http://localhost:4000")
 })
@@ -196,7 +223,6 @@ function cryptPassword(password, callback){
         
     })
 }
-
 
 /*How to handle the search later
 
