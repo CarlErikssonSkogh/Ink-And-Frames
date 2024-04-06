@@ -8,10 +8,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
 });
 
-/* When the user clicks on the button,
-toggle between hiding and showing the dropdown content */
-function dropdownFunction() {
-document.getElementById("myDropdown").classList.toggle("show");
+function dropdownFunction(e) {
+    e.stopPropagation();
+    document.getElementById("myDropdown").classList.toggle("show");
 }
 
 function ratingFunction() {

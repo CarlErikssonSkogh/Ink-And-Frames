@@ -1,4 +1,5 @@
 const express = require("express");
+const app = express();
 const mysql = require("mysql2");
 const dotenv = require("dotenv");
 const path = require("path");
@@ -6,7 +7,7 @@ const bcrypt = require("bcryptjs");
 var session = require('express-session')
 const MySQLStore = require('express-mysql-session')(session);
 
-const app = express();
+
 app.set('views', path.join(__dirname, 'frontend'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'hbs'); // Set Handlebars as the view engine
@@ -27,6 +28,23 @@ const sessionStore = new MySQLStore({
     database: process.env.DATABASE
 });
 
+
+
+// Import http module
+const http = require('http');
+
+// Create a new server using the http module and attach the express app to it
+const server = http.createServer(app);
+
+// Import socket.io and attach the server to it
+const io = require('socket.io')(server);
+
+// Listen for connections from the client
+io.on('connection', (socket) => {
+    console.log('New client connected');
+    // Handle socket events here
+});
+
 app.set('trust proxy', 1) // trust first proxy
 app.use(session({
     store: sessionStore,
@@ -35,6 +53,7 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false }
 }))
+
 
 //Middleware to add user and authentication status to all responses
 app.use((req, res, next) => {
@@ -204,35 +223,39 @@ let rated = false
 let ratingData = []
 //renders media
 app.get("/media", (req, res) => {
+    let AvgRating = 0
     //retrieves mediaName variable from the url
     const mediaName = req.query.name;
     //Filter the mediaData array for the media with the given mediaName
-    console.log("data",mediaData)
     const mediaItem = mediaData.find(item => item.title === mediaName);
     req.session.mediaItem = mediaItem; //Store mediaItem in the session
-    console.log("data",mediaItem)
-    
 
-    db.query('SELECT PersonID, MediaID, Rating, Review from ratings WHERE PersonID = ? and MediaID = ?', [req.session.user.PersonID, mediaItem.mediaID], async (error, result)=>{
+
+    db.query('SELECT PersonID, MediaID, Rating, Review from ratings WHERE MediaID = ?',[mediaItem.mediaID], async (error, result)=>{
         if(error){
             console.log(error)
         }
-        if (result.length == 0){
-            console.log("not rated",result.length)
+
+        ratingData = result.map(item => ({
+            PersonID:item.PersonID,
+            MediaID:item.MediaID,
+            Rating:item.Rating,
+            Review:item.Review
+        }));
+        ratingData.forEach(item => AvgRating += item.Rating);
+        const numberOfRatings = ratingData.length
+        AvgRating /= numberOfRatings
+        console.log("AvgRating",AvgRating)
+
+        const ratingItem = ratingData.find(item => item.PersonID === req.session.user.PersonID);
+        console.log("All data from mediaID",mediaItem.mediaID,ratingData,"Rating Item",ratingItem)
+        if (ratingItem == undefined){
             rated = false
         }else{
-            console.log("rated",result.length)
             rated = true
-            ratingData = result.map(item => ({
-                PersonID:item.PersonID,
-                MediaID:item.MediaID,
-                Rating:item.Rating,
-                Review:item.Review
-            }));
         }
-        const ratingItem = ratingData.find(item => item.PersonID === req.session.user.PersonID);
         //Render the media.hbs with the data
-        res.render('media', { mediaItem: mediaItem,rated: rated, ratingItem:ratingItem });
+        res.render('media', { mediaItem: mediaItem,rated: rated, ratingItem:ratingItem, numberOfRatings:numberOfRatings });
     });
 });
 
@@ -248,21 +271,25 @@ db.query('SELECT PersonID, MediaID FROM ratings WHERE PersonID = ? and MediaID =
     }
     //If the ratings is a new rating (not a edited previous rating)
     if(result.length==0){
-        db.query('INSERT INTO ratings (PersonID, MediaID, Rating) VALUES (?, ?, ?, ?)', [personID, mediaID, rating], async (error, result) => {
+        db.query('INSERT INTO ratings (PersonID, MediaID, Rating) VALUES (?, ?, ?)', [personID, mediaID, rating], async (error, result) => {
             if(error){
                 console.log(error);
             }
+            io.emit('rating updated', {newRating:rating});
+            calculateAvgRating(mediaID);
         });
     } else{
         db.query('UPDATE ratings SET Rating = ? WHERE PersonID = ? AND MediaID = ?', [rating, personID, mediaID], async (error, result) => {
             if(error){
                 console.log(error);
             }
+            io.emit('rating updated', {newRating:rating});
+            calculateAvgRating(mediaID);
         });
     }
 })
 })
-app.listen(4000, ()=> {
+server.listen(4000, ()=> {
     console.log("Servern körs, besök http://localhost:4000")
 })
 
@@ -274,6 +301,24 @@ function cryptPassword(password, callback){
         });
         
     })
+}
+
+function calculateAvgRating(mediaID) {
+    //Calculate the AvgRating
+    db.query('SELECT Rating from ratings WHERE MediaID = ?',[mediaID], async (error, result)=>{
+        if(error){
+            console.log(error)
+        }
+        let AvgRating = 0;
+        result.forEach(item => AvgRating += item.Rating);
+        const numberOfRatings = result.length;
+        AvgRating /= numberOfRatings;
+        console.log("AvgRating",AvgRating)
+        //Updates the Average Rating
+        db.query('UPDATE media SET AvgRating = ? WHERE MediaID = ?', [AvgRating,mediaID], async(error,result) => {
+            io.emit('AvgRating updated', {newAvgRating:AvgRating});
+        })
+    });
 }
 
 /*How to handle the search later
