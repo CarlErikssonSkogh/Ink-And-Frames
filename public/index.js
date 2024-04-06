@@ -3,7 +3,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
     mediaDivs.forEach(div => {
         div.addEventListener('click', function() {
             const mediaName = this.querySelector('#mediaName').textContent;
+            if(isAuthenticated){
             window.location.href = '/media?name=' + encodeURIComponent(mediaName);
+        }else{
+            alert("You need to be signed in to view this page")
+        }
         });
     });
 });

@@ -44,7 +44,7 @@
     <div class= "main">
         <!--Iterates thorugh each item in the mediaData array and displays the title and average rating of the media item-->
         {{#each mediaData}}
-        <div id="media" onclick="" class="clickable-media">
+        <div id="media" class="clickable-media">
             <img id = "mediaImg" src="fightclub.jpg" alt="">
             <div id = "mediaInfoContainer">
             <h1 id="mediaName">{{title}}</h1>
@@ -60,5 +60,6 @@
 
     <div class = "rightCon"><img  class = "frame" src="frame.png" alt=""><img  class = "frame2" src="frame.png" alt=""><img  class = "frame3" src="frame.png" alt=""><img  class = "frame4" src="frame.png" alt=""></div>
 </div>
+<script>var isAuthenticated = {{isAuthenticated}};</script>
 </body>
 </html>

@@ -76,8 +76,10 @@ db.connect((error) => {
 let mediaData= []
 //looks for the index.hbs file in the frontend folder
 app.get("/", (req, res) => {
-    //Query the database for all movies
-    db.query('SELECT MediaID, Title, AvgRating, Description, tag FROM media', (error, result) => {
+    //retrieves the searchQuery
+    let searchQuery = req.session.searchQuery || "";
+    //Query the database for all movies containing searchQuery (displays all movies if searchQuery is not defined)
+    db.query('SELECT MediaID, Title, AvgRating, Description, tag FROM media WHERE Title LIKE ?', [`%${searchQuery}%`], (error, result) => {
         if (error) {
             console.log(error);
             res.status(500).send("Error retrieving data from database");
@@ -97,6 +99,13 @@ app.get("/", (req, res) => {
     });
 });
 
+app.get('/search', (req, res) => {
+    //Get the search query from the session
+    const query = req.query.query;
+    //Save the search query in sessions
+    req.session.searchQuery = query;
+    res.redirect('/');
+});
 
 //renders signUp
 app.get("/signUp", (req, res) => {
@@ -198,7 +207,7 @@ app.post("/signIn", (req, res) => {
                     //password is valid
                     // Store user information in the session
                     req.session.user = result[0];
-                    res.redirect(307, '/');
+                    res.redirect('/');
                 }else   
                 console.log("fel lösenord")                 
                 return res.render('signIn', {
@@ -208,16 +217,6 @@ app.post("/signIn", (req, res) => {
         }
     })
 });
-
-app.get('/search', (req, res) => {
-    const query = req.query.query; // Retrieve the search query from the query parameters
-    // Perform a search for movies based on the query
-    // Return search results to the client
-    const responseText = "Your search query was: " + query;
-    // Send the response as plain text
-    res.send(responseText);
-});
-
 
 let rated = false
 let ratingData = []
@@ -317,15 +316,18 @@ function cryptPassword(password, callback){
 }
 
 function calculateAvgRating(mediaID) {
-    //Calculate the AvgRating
+    //Selects all the Ratings of the specific mediaID
     db.query('SELECT Rating from ratings WHERE MediaID = ?',[mediaID], async (error, result)=>{
         if(error){
             console.log(error)
         }
         let AvgRating = 0;
+        //Calculates the average rating
         result.forEach(item => AvgRating += item.Rating);
+        //Gets the total number of ratings of the media
         const numberOfRatings = result.length;
-        AvgRating /= numberOfRatings;
+        //Calculates the average rating and rounds to 2 decimals
+        AvgRating = Number((AvgRating/numberOfRatings).toFixed(2));
         console.log("AvgRating",AvgRating)
         //Updates the Average Rating
         db.query('UPDATE media SET AvgRating = ? WHERE MediaID = ?', [AvgRating,mediaID], async(error,result) => {
@@ -333,13 +335,3 @@ function calculateAvgRating(mediaID) {
         })
     });
 }
-
-/*How to handle the search later
-
-
-app.get('/search', (req, res) => {
-    const query = req.query.query; // Retrieve the search query from the query parameters
-    // Perform a search for movies based on the query
-    // Return search results to the client
-});
-*/

@@ -46,13 +46,13 @@
     </div>
     <div class="ratingCon">
         <h3>I&F RATING</h3>
-        <h3><img src="star.png" alt=""><span id="AvgRatingText">{{mediaItem.avgRating}}/10</span></h3>
+        <h3><img src="star.png" alt=""><span id="AvgRatingText">{{mediaItem.avgRating}}</span>/10</h3>
     </div>
     <div class="ratingCon">
         {{#if rated}}
         <h3>YOUR RATING</h3>
         <div class="dropdown">
-            <button class="dropbtn"><img onclick="dropdownFunction(event)" src="star.png" alt=""><span onclick="dropdownFunction(event)" id="userRating">{{ratingItem.Rating}}</span></button>
+            <button onclick="dropdownFunction(event)" class="dropbtn"><img onclick="dropdownFunction(event)" src="star.png" alt=""><span onclick="dropdownFunction(event)" id="userRating">{{ratingItem.Rating}}</span>/10</button>
                 <div id="myDropdown" class="dropdown-content">
                     <li>1</li>
                     <li>2</li>
@@ -104,6 +104,7 @@ socket.on('rating updated', function(data) {
 // Check if the updated rating is for the current media items
 document.getElementById('userRating').textContent = data.newRating;
 });
+
 socket.on('AvgRating updated', function(data){
     document.getElementById('AvgRatingText').textContent=data.newAvgRating;
 });
