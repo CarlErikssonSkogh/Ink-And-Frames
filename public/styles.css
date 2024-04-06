@@ -87,14 +87,14 @@ height: 100%;
     position: absolute;
     top: 0;
     right:6vw;
-    width: 10%; /* Adjust this value as needed */
+    width: 10%;
     height: 100%;
     background-color: transparent;
     border: none;
 }
 
 #search button i {
-    color: #333; /* Adjust the color of the icon as needed */
+    color: #333;
 }
 
 #auth{
@@ -118,9 +118,32 @@ height: 100%;
 #auth li a{
     color: white;
     text-decoration: none;
+    font-weight: 150;
+    font-size: 3vh;
     list-style: none;
  }
 
+ #auth li a:hover{
+background-color: #333;
+ }
+
+ #signOut{
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+    color: rgb(255, 255, 255);
+    font-weight: 150;
+    font-size: 3vh;
+    margin: 0;
+ }
+
+ #signOut:hover{
+background-color: #333;
+ }
 /*The main page*/
 .mediaContainer{
 height: 90vh;

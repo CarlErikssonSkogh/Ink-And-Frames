@@ -53,3 +53,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
     })
 });
 }
+
+function signOutFunction(){
+    fetch('/signOut')
+    .then(response => {
+        if (response.ok) {
+            location.reload();
+        } else {
+            console.error('Sign out failed');
+        }
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+}

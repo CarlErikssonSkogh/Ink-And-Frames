@@ -91,7 +91,7 @@ app.get("/", (req, res) => {
                 tag: item.tag
             }));
         
-            //Render the index.hbs with the data and isAuthenticated variable
+            //Render the index.hbs with the data
             res.render('index', { mediaData: mediaData });
         }
     });
@@ -198,7 +198,7 @@ app.post("/signIn", (req, res) => {
                     //password is valid
                     // Store user information in the session
                     req.session.user = result[0];
-                    return res.redirect('/');
+                    res.redirect(307, '/');
                 }else   
                 console.log("fel lösenord")                 
                 return res.render('signIn', {
@@ -289,6 +289,19 @@ db.query('SELECT PersonID, MediaID FROM ratings WHERE PersonID = ? and MediaID =
     }
 })
 })
+
+app.get('/signOut', function(req, res){
+    req.session.destroy(function(err) {
+      if(err) {
+        console.log(err);
+      } else {
+        console.log("Signed out");
+        io.emit('signOut', {message:"Signed out"});
+        res.redirect('/');
+      }
+    });
+  });
+
 server.listen(4000, ()=> {
     console.log("Servern körs, besök http://localhost:4000")
 })
