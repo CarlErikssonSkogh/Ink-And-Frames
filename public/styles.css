@@ -86,7 +86,7 @@ height: 100%;
 #search button {
     position: absolute;
     top: 0;
-    right:6vw;
+    right:4.5vw;
     width: 10%;
     height: 100%;
     background-color: transparent;
@@ -144,9 +144,49 @@ background-color: #333;
  #signOut:hover{
 background-color: #333;
  }
+
+
+
+
 /*The main page*/
+.sortCon{
+    font-family: Impact, sans-serif;
+    width: 100%;
+    background-color: rgb(255, 255, 255);
+    text-shadow: 3px 3px #272727;
+    height: 5vh;
+    color: rgb(172, 168, 168);
+}
+
+#filter{
+    color: rgb(172, 168, 168);
+    position: absolute;
+    top: 12vh;
+    left: 10vw;
+    text-shadow: 3px 3px #272727;
+    font-size: 3.5vh;
+}
+
+.sortList{
+list-style: none;
+position: absolute;
+display: flex;
+flex-direction: row;
+width: 50%;
+top: 12vh;
+left: 10vw;
+font-size: 3vh;
+gap: 2vw;
+}
+
+.sortList li:hover{
+text-decoration: underline black 0.7vh;
+cursor: pointer;
+}
+
+
 .mediaContainer{
-height: 90vh;
+height: 85vh;
 width: 100%;
 background-color: red;
 display: flex;
@@ -160,7 +200,7 @@ height: 100%;
 display: flex;
 justify-content: flex-start;
 flex-direction: column;
-border-right: 3px solid rgb(71, 71, 71);
+border-right: 2vh solid rgb(71, 71, 71);
 }
 
 .ink1{
@@ -191,7 +231,6 @@ height: 100%;
 position: relative;
 overflow-x: hidden;
 overflow-y: hidden;
-border-left: 3px solid rgb(71, 71, 71);
  }
 
  .frame{
@@ -231,6 +270,7 @@ border-left: 3px solid rgb(71, 71, 71);
  }
 
 .main{
+border-top: 2vh solid rgb(71, 71, 71);
 background-color: rgb(0, 0, 0);
 width:80%;
 height: 100%;
@@ -238,12 +278,12 @@ display: flex;
 justify-content: flex-start;
 align-items: flex-start;
 flex-direction: row;
-overflow-x: auto; /* Enable horizontal scrolling */
+overflow-x: auto;
 white-space: nowrap;
  }
 
  #media{
-    flex: 0 0 auto; /* Prevent items from stretching */
+    flex: 0 0 auto;
     margin: 1%;
     height: 65vh;
     width: 18%;

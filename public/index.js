@@ -17,8 +17,33 @@ function dropdownFunction(e) {
     document.getElementById("myDropdown").classList.toggle("show");
 }
 
+document.addEventListener('DOMContentLoaded', (event) => {
+    const sortLi = document.querySelectorAll("#sortBy li");
+    sortLi.forEach(li => {
+        li.addEventListener('click', function(){
+            const sorting = li.textContent;
+            const options = {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({sorting:sorting})
+              };
+              
+              fetch('/sortBy', options)
+                .then(response => {
+                  if (response.ok) {
+                    location.reload();
+                  } else {
+                    throw new Error('Failed to send data');
+                  }
+                })
+        })
+    })
+});
+
 function ratingFunction() {
-// Close the dropdown menu if the user clicks outside of it
+//Close the dropdown menu if the user clicks outside of it
 window.onclick = function(event) {
     if (!event.target.matches('.dropbtn')) {
       var dropdowns = document.getElementsByClassName("dropdown-content");
@@ -37,18 +62,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
     ratingLi.forEach(li => {
         li.addEventListener('click',function(){
             const options = {
-                method: 'POST', // or 'PUT', 'GET', 'DELETE', etc.
+                method: 'POST',
                 headers: {
-                  'Content-Type': 'application/json' // Specify the content type as JSON
+                  'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({rating:li.textContent}) // Convert the data to JSON format
+                body: JSON.stringify({rating:li.textContent}) 
               };
               
-              // Make the fetch request to the specified URL ('rating' endpoint in this case)
               fetch('/rating', options)
                 .then(response => {
                   if (response.ok) {
-                    return response.json(); // Parse the response data as JSON
+                    return response.json();
                   } else {
                     throw new Error('Failed to send data');
                   }

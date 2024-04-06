@@ -78,8 +78,17 @@ let mediaData= []
 app.get("/", (req, res) => {
     //retrieves the searchQuery
     let searchQuery = req.session.searchQuery || "";
+    let sorting = req.session.sorting
+    let sortingType = "";
+    if(sorting == "Rating"){
+        sortingType = "ORDER BY AvgRating DESC";
+    }else if(sorting=="Alphabetical"){
+        sortingType = "ORDER BY Title ASC";
+    } else if(sorting=="Popularity"){
+        sortingType = "ORDER BY FIELD(MediaID, 3, 1, 2)";
+    }
     //Query the database for all movies containing searchQuery (displays all movies if searchQuery is not defined)
-    db.query('SELECT MediaID, Title, AvgRating, Description, tag FROM media WHERE Title LIKE ?', [`%${searchQuery}%`], (error, result) => {
+    db.query(`SELECT MediaID, Title, AvgRating, Description, tag FROM media WHERE Title LIKE ? ${sortingType}`, [`%${searchQuery}%`,sortingType], (error, result) => {
         if (error) {
             console.log(error);
             res.status(500).send("Error retrieving data from database");
@@ -106,6 +115,12 @@ app.get('/search', (req, res) => {
     req.session.searchQuery = query;
     res.redirect('/');
 });
+
+app.post("/sortBy", (req, res) => {
+    const sorting = req.body.sorting
+    req.session.sorting = sorting;
+    res.redirect('/');
+})
 
 //renders signUp
 app.get("/signUp", (req, res) => {

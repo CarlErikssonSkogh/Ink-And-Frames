@@ -19,7 +19,7 @@
         <i class="fa-solid fa-bars"></i>
         <span class="menu-text">Menu</span>
     </nav>
-        <form id="search"action="/search" method="GET">
+    <form id="search"action="/search" method="GET">
         <input id="searchbar" type="text" name="query" placeholder="Search movies...">
         <button type="submit"><i class="fas fa-search"></i></button>
     </form>
@@ -39,6 +39,14 @@
 </header>
 
 <!--The main page with two sidebars-->
+<div class="sortCon">
+    <i id="filter" class="fa-solid fa-filter"></i>
+<ul id="sortBy" class="sortList">
+    Sort By
+    <li>Popularity</li>
+    <li>Alphabetical</li>
+    <li>Rating</li>
+</ul></div>
 <div class="mediaContainer">
     <div class="leftCon"> <img  class = "ink1" src="ink2.jpg" alt=""><img class="ink2" src="ink.png" alt=""></div>
     <div class= "main">
