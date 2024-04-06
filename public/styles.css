@@ -335,8 +335,8 @@ font-weight: 150;
 }
 
 .mediaItemCon h3 img{
-    height: 17.5%;
-    width: 17.5%;
+    height: 4vh;
+    width: 4vh;
     margin: 0;
 }
 
@@ -378,3 +378,94 @@ font-weight: 150;
     font-size: 3vh;
     color: white;
 }
+
+
+/*drop down rating*/
+.dropbtn{
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+    color: rgb(210, 210, 210);
+    font-weight: 150;
+    font-size: 3vh;
+    margin: 0;
+    position: relative;
+}
+.dropbtn img{
+    height: 4vh;
+    width: 4vh;
+    margin: 0;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+
+@keyframes slideDown {
+0% {
+    height: 0;
+    opacity: 0;
+    color: transparent;
+}
+100% {
+    height: 35vh;
+    opacity: 1;
+    color: white;
+}
+}
+@keyframes slideDown2 {
+    0% {
+        height: 0;
+        opacity: 0;
+        color: transparent;
+    }
+    100% {
+        height: 3.5vh;
+        opacity: 1;
+        color: white;
+    }
+}
+
+  /* Dropdown Content (Hidden by Default) */
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    background-color: #313131;
+    border-radius: 5%;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    animation: slideDown 0.5s ease-out forwards;
+  }
+  
+  /* Links inside the dropdown */
+  .dropdown-content li {
+    color: rgb(255, 255, 255);
+    height: 3.5vh;
+    display: flex;
+    text-align: center;
+    font-weight: light;
+    text-decoration: none;
+    font-size: 2.5vh;
+    display: block;
+    cursor: pointer;
+    animation: slideDown2 0.5s ease-out forwards;
+  }
+
+  .dropdown-content li:hover {
+background-color: black;
+  }
+  
+  /* Change color of dropdown links on hover */
+  .dropdown-content a:hover {background-color: #ddd;}
+  
+  /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+  .show {display:block;}

@@ -65,11 +65,13 @@ app.get("/", (req, res) => {
         } else {
             //Map the results to an array of objects
             mediaData = result.map(item => ({
+                mediaID: item.MediaID,
                 title: item.Title,
                 avgRating: item.AvgRating,
                 description: item.Description,
                 tag: item.tag
             }));
+        
             //Render the index.hbs with the data and isAuthenticated variable
             res.render('index', { mediaData: mediaData });
         }
@@ -198,6 +200,8 @@ app.get('/search', (req, res) => {
 });
 
 
+let rated = false
+let ratingData = []
 //renders media
 app.get("/media", (req, res) => {
     //retrieves mediaName variable from the url
@@ -205,11 +209,59 @@ app.get("/media", (req, res) => {
     //Filter the mediaData array for the media with the given mediaName
     console.log("data",mediaData)
     const mediaItem = mediaData.find(item => item.title === mediaName);
+    req.session.mediaItem = mediaItem; //Store mediaItem in the session
     console.log("data",mediaItem)
-    //Render the media.hbs with the data
-    res.render('media', { mediaItem: mediaItem });
+    
+
+    db.query('SELECT PersonID, MediaID, Rating, Review from ratings WHERE PersonID = ? and MediaID = ?', [req.session.user.PersonID, mediaItem.mediaID], async (error, result)=>{
+        if(error){
+            console.log(error)
+        }
+        if (result.length == 0){
+            console.log("not rated",result.length)
+            rated = false
+        }else{
+            console.log("rated",result.length)
+            rated = true
+            ratingData = result.map(item => ({
+                PersonID:item.PersonID,
+                MediaID:item.MediaID,
+                Rating:item.Rating,
+                Review:item.Review
+            }));
+        }
+        const ratingItem = ratingData.find(item => item.PersonID === req.session.user.PersonID);
+        //Render the media.hbs with the data
+        res.render('media', { mediaItem: mediaItem,rated: rated, ratingItem:ratingItem });
+    });
 });
 
+app.post("/rating" ,(req,res) =>{
+const rating=req.body.rating
+const mediaID= req.session.mediaItem.mediaID;
+const personID = req.session.user.PersonID;
+console.log("id",mediaID,"rating",rating);
+db.query('SELECT PersonID, MediaID FROM ratings WHERE PersonID = ? and MediaID = ?',[personID, mediaID], async (error, result) => {
+    console.log("dfslmdfalk",result.length)
+    if(error){
+        console.log(error)
+    }
+    //If the ratings is a new rating (not a edited previous rating)
+    if(result.length==0){
+        db.query('INSERT INTO ratings (PersonID, MediaID, Rating) VALUES (?, ?, ?, ?)', [personID, mediaID, rating], async (error, result) => {
+            if(error){
+                console.log(error);
+            }
+        });
+    } else{
+        db.query('UPDATE ratings SET Rating = ? WHERE PersonID = ? AND MediaID = ?', [rating, personID, mediaID], async (error, result) => {
+            if(error){
+                console.log(error);
+            }
+        });
+    }
+})
+})
 app.listen(4000, ()=> {
     console.log("Servern körs, besök http://localhost:4000")
 })
