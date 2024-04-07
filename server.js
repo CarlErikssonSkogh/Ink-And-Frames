@@ -358,7 +358,7 @@ function calculateAvgRating(mediaID) {
         //Gets the total number of ratings of the media
         const numberOfRatings = result.length
         //Calculates the average rating and rounds to 2 decimals
-        AvgRating = Number((AvgRating/numberOfRatings).toFixed(2));
+        AvgRating = Number((AvgRating/numberOfRatings).toFixed(1));
         console.log("AvgRating",AvgRating)
         //Updates the Average Rating
         db.query('UPDATE media SET AvgRating = ? WHERE MediaID = ?', [AvgRating,mediaID], async(error,result) => {
