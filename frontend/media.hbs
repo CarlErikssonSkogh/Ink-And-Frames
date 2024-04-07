@@ -87,7 +87,7 @@
     </div>
     <div class="ratingCon">
         <h3>RATINGS</h3>
-        <h3>{{numberOfRatings}}</h3>
+        <h3 id="numberOfRatingsText">{{mediaItem.numberOfRatings}}</h3>
     </div>
     </div>
     <div class="mediaItemImgCon">
@@ -107,6 +107,15 @@ document.getElementById('userRating').textContent = data.newRating;
 
 socket.on('AvgRating updated', function(data){
     document.getElementById('AvgRatingText').textContent=data.newAvgRating;
+});
+
+socket.on('new rating added', function(data){
+    document.getElementById('AvgRatingText').textContent=data.newAvgRating;
+    location.reload();
+});
+
+socket.on('numberOfRatings updated', function(data){
+    document.getElementById('numberOfRatingsText').textContent=data.newNumberOfRatings;
 });
 </script>
 </body>

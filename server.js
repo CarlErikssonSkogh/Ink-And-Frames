@@ -78,17 +78,30 @@ let mediaData= []
 app.get("/", (req, res) => {
     //retrieves the searchQuery
     let searchQuery = req.session.searchQuery || "";
-    let sorting = req.session.sorting
+    let sorting = req.session.sorting;
+    let onlyDisplay = req.session.onlyDisplay;
     let sortingType = "";
+    let onlyDisplayMediaType = "";
     if(sorting == "Rating"){
         sortingType = "ORDER BY AvgRating DESC";
     }else if(sorting=="Alphabetical"){
         sortingType = "ORDER BY Title ASC";
     } else if(sorting=="Popularity"){
-        sortingType = "ORDER BY FIELD(MediaID, 3, 1, 2)";
+        sortingType = "ORDER BY numberOfRatings DESC";
     }
+
+    if(onlyDisplay == "All"){
+        onlyDisplayMediaType = ""
+    } else if(onlyDisplay == "Movies"){
+        onlyDisplayMediaType = "AND tag = 'Movie'"
+    } else if(onlyDisplay == "Tv-Shows"){
+        onlyDisplayMediaType = "AND tag = 'Tv-show'"
+    } else if(onlyDisplay == "Books"){
+        onlyDisplayMediaType = "AND tag = 'Book'"
+    }
+
     //Query the database for all movies containing searchQuery (displays all movies if searchQuery is not defined)
-    db.query(`SELECT MediaID, Title, AvgRating, Description, tag FROM media WHERE Title LIKE ? ${sortingType}`, [`%${searchQuery}%`,sortingType], (error, result) => {
+    db.query(`SELECT MediaID, Title, AvgRating, Description, tag, numberOfRatings FROM media WHERE Title LIKE ? ${onlyDisplayMediaType} ${sortingType}`, [`%${searchQuery}%`,sortingType], (error, result) => {
         if (error) {
             console.log(error);
             res.status(500).send("Error retrieving data from database");
@@ -99,7 +112,8 @@ app.get("/", (req, res) => {
                 title: item.Title,
                 avgRating: item.AvgRating,
                 description: item.Description,
-                tag: item.tag
+                tag: item.tag,
+                numberOfRatings: item.numberOfRatings
             }));
         
             //Render the index.hbs with the data
@@ -121,6 +135,13 @@ app.post("/sortBy", (req, res) => {
     req.session.sorting = sorting;
     res.redirect('/');
 })
+
+app.post("/onlyDisplay", (req, res) => {
+    const onlyDisplay = req.body.onlyDisplay
+    req.session.onlyDisplay = onlyDisplay;
+    res.redirect('/');
+})
+
 
 //renders signUp
 app.get("/signUp", (req, res) => {
@@ -237,7 +258,6 @@ let rated = false
 let ratingData = []
 //renders media
 app.get("/media", (req, res) => {
-    let AvgRating = 0
     //retrieves mediaName variable from the url
     const mediaName = req.query.name;
     //Filter the mediaData array for the media with the given mediaName
@@ -256,10 +276,6 @@ app.get("/media", (req, res) => {
             Rating:item.Rating,
             Review:item.Review
         }));
-        ratingData.forEach(item => AvgRating += item.Rating);
-        const numberOfRatings = ratingData.length
-        AvgRating /= numberOfRatings
-        console.log("AvgRating",AvgRating)
 
         const ratingItem = ratingData.find(item => item.PersonID === req.session.user.PersonID);
         console.log("All data from mediaID",mediaItem.mediaID,ratingData,"Rating Item",ratingItem)
@@ -269,7 +285,7 @@ app.get("/media", (req, res) => {
             rated = true
         }
         //Render the media.hbs with the data
-        res.render('media', { mediaItem: mediaItem,rated: rated, ratingItem:ratingItem, numberOfRatings:numberOfRatings });
+        res.render('media', { mediaItem: mediaItem,rated: rated, ratingItem:ratingItem});
     });
 });
 
@@ -289,7 +305,7 @@ db.query('SELECT PersonID, MediaID FROM ratings WHERE PersonID = ? and MediaID =
             if(error){
                 console.log(error);
             }
-            io.emit('rating updated', {newRating:rating});
+            io.emit('new rating added', {newRating:rating});
             calculateAvgRating(mediaID);
         });
     } else{
@@ -340,7 +356,7 @@ function calculateAvgRating(mediaID) {
         //Calculates the average rating
         result.forEach(item => AvgRating += item.Rating);
         //Gets the total number of ratings of the media
-        const numberOfRatings = result.length;
+        const numberOfRatings = result.length
         //Calculates the average rating and rounds to 2 decimals
         AvgRating = Number((AvgRating/numberOfRatings).toFixed(2));
         console.log("AvgRating",AvgRating)
@@ -348,5 +364,8 @@ function calculateAvgRating(mediaID) {
         db.query('UPDATE media SET AvgRating = ? WHERE MediaID = ?', [AvgRating,mediaID], async(error,result) => {
             io.emit('AvgRating updated', {newAvgRating:AvgRating});
         })
+        db.query('UPDATE media SET numberOfRatings = ? WHERE MediaID = ?', [numberOfRatings,mediaID], async(error,result) => {
+            io.emit('numberOfRatings updated', {newNumberOfRatings:numberOfRatings});
+        });
     });
 }

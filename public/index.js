@@ -11,12 +11,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
         });
     });
 });
-
+//Toggles the dropdown menu
 function dropdownFunction(e) {
     e.stopPropagation();
     document.getElementById("myDropdown").classList.toggle("show");
 }
 
+//Function to add click events to the sorting options
 document.addEventListener('DOMContentLoaded', (event) => {
     const sortLi = document.querySelectorAll("#sortBy li");
     sortLi.forEach(li => {
@@ -31,6 +32,32 @@ document.addEventListener('DOMContentLoaded', (event) => {
               };
               
               fetch('/sortBy', options)
+                .then(response => {
+                  if (response.ok) {
+                    location.reload();
+                  } else {
+                    throw new Error('Failed to send data');
+                  }
+                })
+        })
+    })
+});
+
+//Function to add click events to the display only options
+document.addEventListener('DOMContentLoaded', (event) => {
+    const onlyDisplayLi = document.querySelectorAll("#onlyDisplay li");
+    onlyDisplayLi.forEach(li => {
+        li.addEventListener('click', function(){
+            const onlyDisplay = li.textContent;
+            const options = {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({onlyDisplay:onlyDisplay})
+              };
+              
+              fetch('/onlyDisplay', options)
                 .then(response => {
                   if (response.ok) {
                     location.reload();

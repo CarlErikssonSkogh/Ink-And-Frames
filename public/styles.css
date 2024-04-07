@@ -167,6 +167,7 @@ background-color: #333;
     font-size: 3.5vh;
 }
 
+
 .sortList{
 list-style: none;
 position: absolute;
@@ -180,6 +181,25 @@ gap: 2vw;
 }
 
 .sortList li:hover{
+text-decoration: underline black 0.7vh;
+cursor: pointer;
+}
+
+.onlyDisplayList{
+display: flex;
+justify-content: flex-end;
+list-style: none;
+position: absolute;
+display: flex;
+flex-direction: row;
+width: 40%;
+top: 12vh;
+right: 11.5vw;
+font-size: 3vh;
+gap: 2vw;
+}
+
+.onlyDisplayList li:hover{
 text-decoration: underline black 0.7vh;
 cursor: pointer;
 }
@@ -316,6 +336,19 @@ margin: 0;
 align-self: flex-end;
 }
 
+.uploadText{
+    position:absolute;
+    color: rgb(255, 255, 255);
+    width: 80%;
+    align-self: flex-end;
+    text-align: center;
+    bottom: 7.5vh;
+}
+
+.uploadText:hover{
+    text-decoration: underline rgb(255, 255, 255) 0.7vh;
+    cursor: pointer;
+}
 /*Authentication*/
 
 .authCon{
