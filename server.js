@@ -7,7 +7,6 @@ const bcrypt = require("bcryptjs");
 var session = require('express-session')
 const MySQLStore = require('express-mysql-session')(session);
 
-
 app.set('views', path.join(__dirname, 'frontend'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'hbs'); // Set Handlebars as the view engine
@@ -27,8 +26,6 @@ const sessionStore = new MySQLStore({
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE
 });
-
-
 
 // Import http module
 const http = require('http');
@@ -211,7 +208,7 @@ app.post("/signUp", (req, res) => {
                     if(err) {
                         console.log(err)
                     } else {
-                        return res.render('signUp', {
+                        return res.render('signIn', {
                             message: 'User registered'
                         })
                     }       
@@ -266,7 +263,7 @@ app.get("/media", (req, res) => {
 
 
     db.query('SELECT PersonID, MediaID, Rating, Review from ratings WHERE MediaID = ?',[mediaItem.mediaID], async (error, result)=>{
-        if(error){
+        if(error){http://localhost:4000/
             console.log(error)
         }
 
@@ -331,6 +328,14 @@ app.get('/signOut', function(req, res){
       }
     });
   });
+
+
+//renders upload
+app.get("/upload", (req, res) => {
+    res.render("upload");
+});
+
+
 
 server.listen(4000, ()=> {
     console.log("Servern körs, besök http://localhost:4000")

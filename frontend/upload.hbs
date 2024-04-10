@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!--The header, contains title, Menu, Searchbar and Login/Registration-->
+<header id = header>
+    <div id ="title">
+    <a id="titleText" href="/">Ink&Frames</a>
+    </div>
+    <nav id="menu">
+        <i class="fa-solid fa-bars"></i>
+        <span class="menu-text">Menu</span>
+    </nav>
+        <form id="search"action="/search" method="GET">
+        <input id="searchbar" type="text" name="query" placeholder="Search movies...">
+        <button type="submit"><i class="fas fa-search"></i></button>
+    </form>
+
+    <nav id="auth">
+<ul>
+  {{#if isAuthenticated}}
+    <li><a href="">{{user.Username}}</a></li>
+  {{else}}
+    <li id="signIn"><a href="/signIn">Sign in</a></li>
+    <li id="signUp"><a href="/signUp">Sign up</a></li>
+  {{/if}}
+</ul>
+    </nav>
+</header>
+</body>
+</html>
