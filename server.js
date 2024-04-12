@@ -73,6 +73,7 @@ db.connect((error) => {
 let mediaData= []
 //looks for the index.hbs file in the frontend folder
 app.get("/", (req, res) => {
+    console.log("poster",req.session.uploadData)
     //retrieves the searchQuery
     let searchQuery = req.session.searchQuery || "";
     let sorting = req.session.sorting;
@@ -98,7 +99,7 @@ app.get("/", (req, res) => {
     }
 
     //Query the database for all movies containing searchQuery (displays all movies if searchQuery is not defined)
-    db.query(`SELECT MediaID, Title, AvgRating, Description, tag, numberOfRatings FROM media WHERE Title LIKE ? ${onlyDisplayMediaType} ${sortingType}`, [`%${searchQuery}%`,sortingType], (error, result) => {
+    db.query(`SELECT * FROM media WHERE Title LIKE ? ${onlyDisplayMediaType} ${sortingType}`, [`%${searchQuery}%`,sortingType], (error, result) => {
         if (error) {
             console.log(error);
             res.status(500).send("Error retrieving data from database");
@@ -109,7 +110,10 @@ app.get("/", (req, res) => {
                 title: item.Title,
                 avgRating: item.AvgRating,
                 description: item.Description,
-                tag: item.tag,
+                tag: item.Tag,
+                star: item.Star,
+                year: item.Year,
+                poster: item.Poster,
                 numberOfRatings: item.numberOfRatings
             }));
         
@@ -150,6 +154,19 @@ app.get("/signIn", (req, res) => {
     res.render("signIn");
 });
 
+//renders upload
+app.get("/upload", (req, res) => {
+    const data = {}; // Replace this with the actual data
+    res.render("upload", data);
+});
+
+//Handles the post from upload
+app.post('/uploadMedia', (req, res) => {
+    const uploadData = req.body
+    req.session.uploadData = uploadData
+    db.query('INSERT INTO media SET?', {Title: uploadData.title, Tag: uploadData.tag, Star: uploadData.stars, Year: uploadData.year, Poster: uploadData.poster }, (err, result) => {
+})
+})
 /*Handles sign up */
 app.post("/signUp", (req, res) => {
     //Variabel för hur ett korrekt lösenord ska se ut
@@ -259,6 +276,7 @@ app.get("/media", (req, res) => {
     const mediaName = req.query.name;
     //Filter the mediaData array for the media with the given mediaName
     const mediaItem = mediaData.find(item => item.title === mediaName);
+    console.log("All data from mediaID",mediaItem)
     req.session.mediaItem = mediaItem; //Store mediaItem in the session
 
 
@@ -275,7 +293,6 @@ app.get("/media", (req, res) => {
         }));
 
         const ratingItem = ratingData.find(item => item.PersonID === req.session.user.PersonID);
-        console.log("All data from mediaID",mediaItem.mediaID,ratingData,"Rating Item",ratingItem)
         if (ratingItem == undefined){
             rated = false
         }else{
@@ -329,14 +346,6 @@ app.get('/signOut', function(req, res){
     });
   });
 
-
-//renders upload
-app.get("/upload", (req, res) => {
-    res.render("upload");
-});
-
-
-
 server.listen(4000, ()=> {
     console.log("Servern körs, besök http://localhost:4000")
 })
@@ -346,8 +355,7 @@ function cryptPassword(password, callback){
     bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(password, salt, function(err, hash) {
         callback(err, hash)
-        });
-        
+        });       
     })
 }
 

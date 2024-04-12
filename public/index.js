@@ -122,3 +122,66 @@ function signOutFunction(){
       console.error('Error:', error);
     });
 }
+
+//gets the search value from the searchbar
+window.onload = function() {
+  document.getElementById('uploadSearch').addEventListener('submit', function(event) {
+      event.preventDefault();
+      var searchValue = document.getElementById('uploadSearchbar').value;
+      console.log(searchValue);
+      uploadMedia(searchValue);
+  });
+}
+//Function to handle the upload media search
+async function uploadMedia(search){
+  console.log("you searched for",search)
+const url = `https://imdb8.p.rapidapi.com/auto-complete?q=${search}`;
+const options = {
+	method: 'GET',
+	headers: {
+		'X-RapidAPI-Key': 'dd7e095a77mshe11764b1ba51b5ep161722jsne5dad747c107',
+		'X-RapidAPI-Host': 'imdb8.p.rapidapi.com'
+	}
+};
+
+try {
+  const response = await fetch(url, options);
+  const result = await response.json();
+  const list = result.d;
+  document.querySelector('.uploadMedia').innerHTML = "";
+  list.map((item) => {
+      const title=item.l;
+      const poster = item.i.imageUrl;
+      const tag = item.q
+      const stars = item.s
+      const year = item.y
+      const trailer = item.v
+      console.log(title,poster, trailer)
+      const uploadResults = document.createElement('div');
+      uploadResults.innerHTML = `<h3>${title}</h3><img src="${poster}" alt="poster" width="100" height="100">`;
+      uploadResults.addEventListener('click', () => {
+          console.log(title, poster, tag, stars, year);
+          //post all the correct information about the clicked media to the server    
+          const postOptions = {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({title,poster,tag,stars,year}) 
+          };
+
+          fetch('/uploadMedia', postOptions)
+            .then(response => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                throw new Error('Failed to send data');
+              }
+            })
+      });
+      document.querySelector('.uploadMedia').appendChild(uploadResults);
+  })
+} catch (error) {
+  console.error(error);
+}
+}

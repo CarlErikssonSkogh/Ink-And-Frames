@@ -61,7 +61,7 @@
         <!--Iterates thorugh each item in the mediaData array and displays the title and average rating of the media item-->
         {{#each mediaData}}
         <div id="media" class="clickable-media">
-            <img id = "mediaImg" src="fightclub.jpg" alt="">
+            <img id = "mediaImg" src="{{poster}}" alt="">
             <div id = "mediaInfoContainer">
             <h1 id="mediaName">{{title}}</h1>
             <h1>
@@ -72,7 +72,7 @@
         </div> 
         <!--End of iteration-->
         {{/each}}
-        <div class="uploadText"><a href="/upload.hbs" class="uploadMedia">UPLOAD NEW MEDIA</a></div>
+        <div class="uploadText"><a href="upload" class="uploadMedia">UPLOAD NEW MEDIA</a></div>
     </div>
 
     <div class = "rightCon"><img  class = "frame" src="frame.png" alt=""><img  class = "frame2" src="frame.png" alt=""><img  class = "frame3" src="frame.png" alt=""><img  class = "frame4" src="frame.png" alt=""></div>
