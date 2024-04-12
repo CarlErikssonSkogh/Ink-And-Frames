@@ -6,11 +6,34 @@ const path = require("path");
 const bcrypt = require("bcryptjs");
 var session = require('express-session')
 const MySQLStore = require('express-mysql-session')(session);
+const expressHbs = require('express-handlebars');
 
+dotenv.config({path: "./.env"});
+
+const hbs = expressHbs.create({
+    defaultLayout: undefined
+});
+
+hbs.handlebars.registerHelper('truncate', function (str) {
+    if (str && str.length > 18) {
+        return str.substring(0, 18) + '...';
+    } else {
+        return str;
+    }
+});
+
+hbs.handlebars.registerHelper('reduce', function (str) {
+    if (str && str.length > 30) {
+        return str.substring(0, 57) + '...';
+    } else {
+        return str;
+    }
+});
+
+app.engine('hbs', hbs.engine);
+app.set('view engine', 'hbs'); // Set Handlebars as the view engine
 app.set('views', path.join(__dirname, 'frontend'));
 app.use(express.static(path.join(__dirname, 'public')));
-app.set('view engine', 'hbs'); // Set Handlebars as the view engine
-dotenv.config({path: "./.env"});
 
 const db = mysql.createConnection({
     //värden hämtas från .env
@@ -93,7 +116,7 @@ app.get("/", (req, res) => {
         onlyDisplayMediaType = "AND tag = 'feature'"
     } else if(onlyDisplay == "Tv-Shows"){
         onlyDisplayMediaType = "AND tag = 'Tv series'"
-    } else if(onlyDisplay == "Books"){
+    } else if(onlyDisplay == "Not rated"){
         onlyDisplayMediaType = "AND tag = 'Book'"
     }
 

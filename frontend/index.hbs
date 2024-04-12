@@ -64,7 +64,7 @@
         <div id="media" class="clickable-media">
             <img id = "mediaImg" src="{{poster}}" alt="">
             <div id = "mediaInfoContainer">
-            <h1 id="mediaName">{{title}}</h1>
+            <h2 id="mediaName" data-fulltitle="{{title}}">{{truncate title}}</h2>
             <h1>
                 <img src="star.png" alt="">
                 {{avgRating}}/10</h1>
@@ -79,6 +79,8 @@
 
     <div class = "rightCon"><img  class = "frame" src="frame.png" alt=""><img  class = "frame2" src="frame.png" alt=""><img  class = "frame3" src="frame.png" alt=""><img  class = "frame4" src="frame.png" alt=""></div>
 </div>
-<script>var isAuthenticated = {{isAuthenticated}};</script>
+<script>
+var isAuthenticated = {{isAuthenticated}}
+</script>
 </body>
 </html>

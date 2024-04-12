@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const mediaDivs = document.querySelectorAll('.clickable-media');
     mediaDivs.forEach(div => {
         div.addEventListener('click', function() {
-            const mediaName = this.querySelector('#mediaName').textContent;
+            const mediaName = this.querySelector('#mediaName').dataset.fulltitle;
             if(isAuthenticated){
             window.location.href = '/media?name=' + encodeURIComponent(mediaName);
         }else{
