@@ -149,35 +149,42 @@ try {
   const result = await response.json();
   const list = result.d;
   document.querySelector('.uploadMedia').innerHTML = "";
-  list.map((item) => {
+  list.map(async (item) => {
       const title=item.l;
       const poster = item.i.imageUrl;
       const tag = item.q
       const stars = item.s
       const year = item.y
-      const trailer = item.v
-      console.log(title,poster, trailer)
+      const id = item.id//get the movie ID
+
       const uploadResults = document.createElement('div');
       uploadResults.innerHTML = `<h3>${title}</h3><img src="${poster}" alt="poster" width="100" height="100">`;
-      uploadResults.addEventListener('click', () => {
-          console.log(title, poster, tag, stars, year);
+      uploadResults.style.cursor = 'pointer';
+
+      //add event listener to the search results
+      uploadResults.addEventListener('click', async () => {
+      const plotUrl = `https://imdb8.p.rapidapi.com/title/v2/get-plot?tconst=${id}`;//search for the plot using the id
+      const plotResponse = await fetch(plotUrl, options);//fetch the plot
+      const plotResult = await plotResponse.json();//get the results in json
+      const plot = plotResult.data.title.plot.plotText.plainText //get the plot of the movie
+          console.log(plot);
+
           //post all the correct information about the clicked media to the server    
           const postOptions = {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({title,poster,tag,stars,year}) 
+            body: JSON.stringify({title,poster,tag,stars,year,plot}) 
           };
 
           fetch('/uploadMedia', postOptions)
-            .then(response => {
-              if (response.ok) {
-                return response.json();
-              } else {
-                throw new Error('Failed to send data');
-              }
-            })
+          .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            }
+        })
+        .catch(error => console.error('Error:', error));
       });
       document.querySelector('.uploadMedia').appendChild(uploadResults);
   })

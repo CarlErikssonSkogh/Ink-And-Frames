@@ -73,7 +73,6 @@ db.connect((error) => {
 let mediaData= []
 //looks for the index.hbs file in the frontend folder
 app.get("/", (req, res) => {
-    console.log("poster",req.session.uploadData)
     //retrieves the searchQuery
     let searchQuery = req.session.searchQuery || "";
     let sorting = req.session.sorting;
@@ -91,15 +90,15 @@ app.get("/", (req, res) => {
     if(onlyDisplay == "All"){
         onlyDisplayMediaType = ""
     } else if(onlyDisplay == "Movies"){
-        onlyDisplayMediaType = "AND tag = 'Movie'"
+        onlyDisplayMediaType = "AND tag = 'feature'"
     } else if(onlyDisplay == "Tv-Shows"){
-        onlyDisplayMediaType = "AND tag = 'Tv-show'"
+        onlyDisplayMediaType = "AND tag = 'Tv series'"
     } else if(onlyDisplay == "Books"){
         onlyDisplayMediaType = "AND tag = 'Book'"
     }
 
     //Query the database for all movies containing searchQuery (displays all movies if searchQuery is not defined)
-    db.query(`SELECT * FROM media WHERE Title LIKE ? ${onlyDisplayMediaType} ${sortingType}`, [`%${searchQuery}%`,sortingType], (error, result) => {
+    db.query(`SELECT * FROM media WHERE Title LIKE ? ${onlyDisplayMediaType} ${sortingType}`, [`%${searchQuery}%`], (error, result) => {
         if (error) {
             console.log(error);
             res.status(500).send("Error retrieving data from database");
@@ -109,16 +108,21 @@ app.get("/", (req, res) => {
                 mediaID: item.MediaID,
                 title: item.Title,
                 avgRating: item.AvgRating,
-                description: item.Description,
                 tag: item.Tag,
                 star: item.Star,
                 year: item.Year,
                 poster: item.Poster,
+                plot: item.Plot,
                 numberOfRatings: item.numberOfRatings
             }));
-        
+
+            //checks if the user is an admin
+            let adminPermission = false;
+            if (req.session.admin) {
+                adminPermission = req.session.admin.adminPermission;
+            }
             //Render the index.hbs with the data
-            res.render('index', { mediaData: mediaData });
+            res.render('index', { mediaData: mediaData, adminPermission:adminPermission });
         }
     });
 });
@@ -164,8 +168,16 @@ app.get("/upload", (req, res) => {
 app.post('/uploadMedia', (req, res) => {
     const uploadData = req.body
     req.session.uploadData = uploadData
-    db.query('INSERT INTO media SET?', {Title: uploadData.title, Tag: uploadData.tag, Star: uploadData.stars, Year: uploadData.year, Poster: uploadData.poster }, (err, result) => {
-})
+    db.query(`SELECT MediaID FROM media WHERE Title = ?`, [uploadData.title], (error, result) => {
+        if(result.length != 0){
+            console.log("already exists")
+            return res.redirect('/');
+        }else{
+        db.query('INSERT INTO media SET?', {Title: uploadData.title, Tag: uploadData.tag, Star: uploadData.stars, Year: uploadData.year, Poster: uploadData.poster, Plot: uploadData.plot }, (err, result) => {
+            return res.redirect('/');
+        })
+        }
+    });
 })
 /*Handles sign up */
 app.post("/signUp", (req, res) => {
@@ -255,9 +267,18 @@ app.post("/signIn", (req, res) => {
             bcrypt.compare(password, result[0].Password, function(err, isMatch) {
                 if (isMatch) {
                     //password is valid
+                    //checks if the user is an admin
+                    if(result[0].Username == "admin"){
+                        if(!req.session.admin) {
+                            req.session.admin = {};
+                        }
+                        req.session.admin.adminPermission = true;
+                    }
+                    console.log("admin",req.session.admin ? req.session.admin.adminPermission : 'No admin session');
                     // Store user information in the session
                     req.session.user = result[0];
-                    res.redirect('/');
+                    return res.redirect('/');
+
                 }else   
                 console.log("fel lösenord")                 
                 return res.render('signIn', {
@@ -320,15 +341,14 @@ db.query('SELECT PersonID, MediaID FROM ratings WHERE PersonID = ? and MediaID =
                 console.log(error);
             }
             io.emit('new rating added', {newRating:rating});
-            calculateAvgRating(mediaID);
+            calculateAvgRating(mediaID, rating);
         });
     } else{
         db.query('UPDATE ratings SET Rating = ? WHERE PersonID = ? AND MediaID = ?', [rating, personID, mediaID], async (error, result) => {
             if(error){
                 console.log(error);
             }
-            io.emit('rating updated', {newRating:rating});
-            calculateAvgRating(mediaID);
+            calculateAvgRating(mediaID, rating);
         });
     }
 })
@@ -359,7 +379,7 @@ function cryptPassword(password, callback){
     })
 }
 
-function calculateAvgRating(mediaID) {
+function calculateAvgRating(mediaID, rating) {
     //Selects all the Ratings of the specific mediaID
     db.query('SELECT Rating from ratings WHERE MediaID = ?',[mediaID], async (error, result)=>{
         if(error){
@@ -375,10 +395,44 @@ function calculateAvgRating(mediaID) {
         console.log("AvgRating",AvgRating)
         //Updates the Average Rating
         db.query('UPDATE media SET AvgRating = ? WHERE MediaID = ?', [AvgRating,mediaID], async(error,result) => {
-            io.emit('AvgRating updated', {newAvgRating:AvgRating});
+
+            db.query('UPDATE media SET numberOfRatings = ? WHERE MediaID = ?', [numberOfRatings,mediaID], async(error,result) => {
+                io.emit('Rating updated', {newNumberOfRatings:numberOfRatings,newAvgRating:AvgRating, newRating:rating});
+            });
         })
-        db.query('UPDATE media SET numberOfRatings = ? WHERE MediaID = ?', [numberOfRatings,mediaID], async(error,result) => {
-            io.emit('numberOfRatings updated', {newNumberOfRatings:numberOfRatings});
-        });
     });
 }
+
+//renders admin
+app.get("/admin", function(req, res){
+    db.query('SELECT * from ratings',async (error, result)=>{
+        const allRatingData = result.map(item => ({
+            personID: item.PersonID,
+            mediaID: item.MediaID,
+            rating: item.Rating
+        }));
+    res.render("admin" ,{mediaData:mediaData, allRatingData:allRatingData});
+    });
+});
+
+app.post("/admin", function(req, res){
+    const mediaName = req.body.mediaName
+    console.log(mediaName)
+    const mediaItem = mediaData.find(item => item.title === mediaName);
+    const mediaItemID=mediaItem.mediaID
+    db.query("DELETE FROM ratings WHERE MediaID = ?", [mediaItemID], (error, result) => {
+        if (error) {
+            console.log(error);
+            res.status(500).send("Error deleting data from database");
+        }
+    });
+    db.query("DELETE FROM media WHERE MediaID = ?", [mediaItemID], (error, result) =>{
+        if (error) {
+            console.log(error);
+            res.status(500).send("Error deleting data from database");
+        } else {
+            res.redirect('/');
+        }
+    })
+});
+

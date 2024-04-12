@@ -17,10 +17,9 @@
     <div id ="title">
     <a id="titleText" href="/">Ink&Frames</a>
     </div>
-    <nav id="menu">
-        <i class="fa-solid fa-bars"></i>
-        <span class="menu-text">Menu</span>
-    </nav>
+        {{#if adminPermission}}
+        <a href="admin" class="admin">Admin</a>
+        {{/if}}
         <form id="search"action="/search" method="GET">
         <input id="searchbar" type="text" name="query" placeholder="Search movies...">
         <button type="submit"><i class="fas fa-search"></i></button>
@@ -41,8 +40,9 @@
 <div class="mediaItemCon">
     <div class="mediaItemInfo">
     <div class="mediaItemName">
+        
         <h1>{{mediaItem.title}}</h1>
-        <h2>{{mediaItem.tag}}</h2>
+        <h2>{{mediaItem.tag}} - {{mediaItem.year}}</h2>
     </div>
     <div class="ratingCon">
         <h3>I&F RATING</h3>
@@ -69,7 +69,7 @@
         {{else}}
         <h3>YOUR RATING</h3>
         <div class="dropdown">
-            <button onclick="dropdownFunction(event)" class="dropbtn"><img src="starOutline.png" alt="">Rate</button>
+            <button onclick="dropdownFunction(event)" id="ratingButton" class="dropbtn"><img src="starOutline.png" alt=""><span id="userRating"></span>Rate</button>
                 <div id="myDropdown" class="dropdown-content">
                     <li>1</li>
                     <li>2</li>
@@ -92,31 +92,27 @@
     </div>
     <div class="mediaItemImgCon">
     <img id = "mediaItemImg" src="{{mediaItem.poster}}" alt="">
-    <iframe width="70%" height="100%" src="https://www.youtube.com/embed/SUXWAEX2jlg?rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <p class="description">{{mediaItem.plot}}</p>
     </div>
-    <p class="description">{{mediaItem.description}}</p>
+    <h2 class="star">Starring {{mediaItem.star}}</h1>
 </div> 
 <script>
 ratingFunction()
     var socket = io();
 
-socket.on('rating updated', function(data) {
+
+socket.on('Rating updated', function(data) {
 // Check if the updated rating is for the current media items
 document.getElementById('userRating').textContent = data.newRating;
-});
-
-socket.on('AvgRating updated', function(data){
-    document.getElementById('AvgRatingText').textContent=data.newAvgRating;
+document.getElementById('AvgRatingText').textContent=data.newAvgRating;
+document.getElementById('numberOfRatingsText').textContent=data.newNumberOfRatings;
 });
 
 socket.on('new rating added', function(data){
-    document.getElementById('AvgRatingText').textContent=data.newAvgRating;
-    location.reload();
+    var button = document.getElementById('ratingButton');
+    button.innerHTML = '<img onclick="dropdownFunction(event)" src="star.png" alt=""><span onclick="dropdownFunction(event)" id="userRating">' + data.newRating + '</span>/10';
 });
 
-socket.on('numberOfRatings updated', function(data){
-    document.getElementById('numberOfRatingsText').textContent=data.newNumberOfRatings;
-});
 </script>
 </body>
 </html>

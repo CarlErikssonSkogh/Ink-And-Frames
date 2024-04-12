@@ -16,8 +16,9 @@
     <a id="titleText" href="/">Ink&Frames</a>
     </div>
     <nav id="menu">
-        <i class="fa-solid fa-bars"></i>
-        <span class="menu-text">Menu</span>
+        {{#if adminPermission}}
+        <a href="admin" class="admin">Admin</a>
+        {{/if}}
     </nav>
     <form id="search"action="/search" method="GET">
         <input id="searchbar" type="text" name="query" placeholder="Search movies...">
@@ -52,7 +53,7 @@
     <li>All</li>
     <li>Movies</li>
     <li>Tv-Shows</li>
-    <li>Books</li>
+    <li>Not rated</li>
 </ul>
 </div>
 <div class="mediaContainer">
@@ -73,6 +74,7 @@
         <!--End of iteration-->
         {{/each}}
         <div class="uploadText"><a href="upload" class="uploadMedia">UPLOAD NEW MEDIA</a></div>
+        <h1 class="credits">Information courtesy of IMDb (https://www.imdb.com). Used with permission.</h1>
     </div>
 
     <div class = "rightCon"><img  class = "frame" src="frame.png" alt=""><img  class = "frame2" src="frame.png" alt=""><img  class = "frame3" src="frame.png" alt=""><img  class = "frame4" src="frame.png" alt=""></div>

@@ -349,6 +349,17 @@ align-self: flex-end;
     text-decoration: underline rgb(255, 255, 255) 0.7vh;
     cursor: pointer;
 }
+
+.credits{
+    font-size: smaller;
+    position:absolute;
+    color: rgb(255, 255, 255);
+    width: 80%;
+    align-self: flex-end;
+    text-align: center;
+    bottom: 3vh;
+}
+
 /*Authentication*/
 
 .authCon{
@@ -475,6 +486,16 @@ font-weight: 150;
     color: white;
 }
 
+.star{
+    margin-top: 5vh;
+    display: flex;
+    align-self: flex-start;
+    width: 70%;
+    height: 5%;
+    font-size: 3vh;
+    color: white;
+}
+
 
 /*drop down rating*/
 .dropbtn{
@@ -565,3 +586,21 @@ background-color: black;
   
   /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
   .show {display:block;}
+
+
+
+
+/*Admin*/
+.confirmDelete{
+    position:absolute;
+    color: rgb(255, 255, 255);
+    width: 80%;
+    align-self: flex-end;
+    text-align: center;
+    bottom: 7.5vh;
+}
+
+.confirmDelete:hover{
+    text-decoration: underline rgb(255, 255, 255) 0.7vh;
+    cursor: pointer;
+}

@@ -15,10 +15,9 @@
     <div id ="title">
     <a id="titleText" href="/">Ink&Frames</a>
     </div>
-    <nav id="menu">
-        <i class="fa-solid fa-bars"></i>
-        <span class="menu-text">Menu</span>
-    </nav>
+        {{#if adminPermission}}
+        <a href="admin" class="admin">Admin</a>
+        {{/if}}
         <form id="search"action="/search" method="GET">
         <input id="searchbar" type="text" name="query" placeholder="Search movies...">
         <button type="submit"><i class="fas fa-search"></i></button>
