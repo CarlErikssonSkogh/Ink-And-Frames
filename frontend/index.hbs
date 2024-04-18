@@ -57,7 +57,7 @@
 </ul>
 </div>
 <div class="mediaContainer">
-    <div class="leftCon"> <img  class = "ink1" src="ink2.jpg" alt=""><img class="ink2" src="ink.png" alt=""></div>
+    <div class="leftCon"> <img  class = "ink1" src="images/ink2.jpg" alt=""><img class="ink2" src="images/ink.png" alt=""></div>
     <div class= "main">
         <!--Iterates thorugh each item in the mediaData array and displays the title and average rating of the media item-->
         {{#each mediaData}}
@@ -66,7 +66,7 @@
             <div id = "mediaInfoContainer">
             <h2 id="mediaName" data-fulltitle="{{title}}">{{truncate title}}</h2>
             <h1>
-                <img src="star.png" alt="">
+                <img src="images/star.png" alt="">
                 {{avgRating}}/10</h1>
             </div>
             <h1>{{tag}}</h1>
@@ -77,7 +77,7 @@
         <h1 class="credits">Information courtesy of IMDb (https://www.imdb.com). Used with permission.</h1>
     </div>
 
-    <div class = "rightCon"><img  class = "frame" src="frame.png" alt=""><img  class = "frame2" src="frame.png" alt=""><img  class = "frame3" src="frame.png" alt=""><img  class = "frame4" src="frame.png" alt=""></div>
+    <div class = "rightCon"><img  class = "frame" src="images/frame.png" alt=""><img  class = "frame2" src="images/frame.png" alt=""><img  class = "frame3" src="images/frame.png" alt=""><img  class = "frame4" src="images/frame.png" alt=""></div>
 </div>
 <script>
 var isAuthenticated = {{isAuthenticated}}

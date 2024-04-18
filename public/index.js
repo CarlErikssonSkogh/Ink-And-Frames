@@ -125,37 +125,42 @@ function signOutFunction(){
 
 //gets the search value from the searchbar
 window.onload = function() {
-  document.getElementById('uploadSearch').addEventListener('submit', function(event) {
+  document.getElementById('/uploadSearch').addEventListener('submit', function(event) {
       event.preventDefault();
       var searchValue = document.getElementById('uploadSearchbar').value;
-      console.log(searchValue);
       uploadMedia(searchValue);
   });
 }
+
 //Function to handle the upload media search
 async function uploadMedia(search){
-  console.log("you searched for",search)
-const url = `https://imdb8.p.rapidapi.com/auto-complete?q=${search}`;
-const options = {
-	method: 'GET',
-	headers: {
-		'X-RapidAPI-Key': 'dd7e095a77mshe11764b1ba51b5ep161722jsne5dad747c107',
-		'X-RapidAPI-Host': 'imdb8.p.rapidapi.com'
-	}
-};
-
-try {
-  const response = await fetch(url, options);
-  const result = await response.json();
-  const list = result.d;
+  const searchOption ={
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+      body: JSON.stringify({search}) 
+    };
+try{
+  const response = await fetch('/uploadSearch', searchOption)
+  if (!response.ok){
+    throw new Error('Failed to send data');
+  }
+  const data = await response.json();
+  const mediaList = data.list;
+  console.log("you searched for",search);
   document.querySelector('.uploadMedia').innerHTML = "";
-  list.map(async (item) => {
+
+  
+  
+  mediaList.map(async (item) => {
       const title=item.l;
       const poster = item.i.imageUrl;
-      const tag = item.q
-      const stars = item.s
-      const year = item.y
-      const id = item.id//get the movie ID
+      const tag = item.q;
+      const stars = item.s;
+      const year = item.y;
+      const id = item.id
+
 
       const uploadResults = document.createElement('div');
       uploadResults.innerHTML = `<h3>${title}</h3><img src="${poster}" alt="poster" width="100" height="100">`;
@@ -163,11 +168,17 @@ try {
 
       //add event listener to the search results
       uploadResults.addEventListener('click', async () => {
-      const plotUrl = `https://imdb8.p.rapidapi.com/title/v2/get-plot?tconst=${id}`;//search for the plot using the id
-      const plotResponse = await fetch(plotUrl, options);//fetch the plot
-      const plotResult = await plotResponse.json();//get the results in json
-      const plot = plotResult.data.title.plot.plotText.plainText //get the plot of the movie
-          console.log(plot);
+        const plotOption ={
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+            body: JSON.stringify({id}) 
+          };
+
+          const plotResponse = await fetch('/getPlot', plotOption)
+          const plotData = await plotResponse.json();
+          const plot = plotData.plot
 
           //post all the correct information about the clicked media to the server    
           const postOptions = {
@@ -188,7 +199,7 @@ try {
       });
       document.querySelector('.uploadMedia').appendChild(uploadResults);
   })
-} catch (error) {
-  console.error(error);
+}catch(error){
+  console.error('Error:', error);
 }
-}
+};

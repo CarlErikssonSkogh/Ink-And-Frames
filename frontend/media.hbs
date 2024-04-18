@@ -46,13 +46,13 @@
     </div>
     <div class="ratingCon">
         <h3>I&F RATING</h3>
-        <h3><img src="star.png" alt=""><span id="AvgRatingText">{{mediaItem.avgRating}}</span>/10</h3>
+        <h3><img src="images/star.png" alt=""><span id="AvgRatingText">{{mediaItem.avgRating}}</span>/10</h3>
     </div>
     <div class="ratingCon">
         {{#if rated}}
         <h3>YOUR RATING</h3>
         <div class="dropdown">
-            <button onclick="dropdownFunction(event)" class="dropbtn"><img onclick="dropdownFunction(event)" src="star.png" alt=""><span onclick="dropdownFunction(event)" id="userRating">{{ratingItem.Rating}}</span>/10</button>
+            <button onclick="dropdownFunction(event)" class="dropbtn"><img onclick="dropdownFunction(event)" src="images/star.png" alt=""><span onclick="dropdownFunction(event)" id="userRating">{{ratingItem.Rating}}</span>/10</button>
                 <div id="myDropdown" class="dropdown-content">
                     <li>1</li>
                     <li>2</li>
@@ -69,7 +69,7 @@
         {{else}}
         <h3>YOUR RATING</h3>
         <div class="dropdown">
-            <button onclick="dropdownFunction(event)" id="ratingButton" class="dropbtn"><img src="starOutline.png" alt=""><span id="userRating"></span>Rate</button>
+            <button onclick="dropdownFunction(event)" id="ratingButton" class="dropbtn"><img src="images/starOutline.png" alt=""><span id="userRating"></span>Rate</button>
                 <div id="myDropdown" class="dropdown-content">
                     <li>1</li>
                     <li>2</li>
@@ -110,7 +110,7 @@ document.getElementById('numberOfRatingsText').textContent=data.newNumberOfRatin
 
 socket.on('new rating added', function(data){
     var button = document.getElementById('ratingButton');
-    button.innerHTML = '<img onclick="dropdownFunction(event)" src="star.png" alt=""><span onclick="dropdownFunction(event)" id="userRating">' + data.newRating + '</span>/10';
+    button.innerHTML = '<img onclick="dropdownFunction(event)" src="images/star.png" alt=""><span onclick="dropdownFunction(event)" id="userRating">' + data.newRating + '</span>/10';
 });
 
 </script>

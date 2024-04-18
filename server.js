@@ -187,6 +187,47 @@ app.get("/upload", (req, res) => {
     res.render("upload", data);
 });
 
+app.post('/uploadSearch', async (req, res) => {
+    const search = req.body.search
+    console.log("search",search)
+    console.log("the search sent to the backend is", `https://imdb8.p.rapidapi.com/auto-complete?q=${search}`)
+    const url = `https://imdb8.p.rapidapi.com/auto-complete?q=${search}`;
+    const options = {
+        method: 'GET',
+        headers: {
+            'X-RapidAPI-Key': process.env.API_KEY,
+            'X-RapidAPI-Host': process.env.API_HOST
+        }
+    };
+    
+    try {
+      const response = await fetch(url, options);
+      const result = await response.json();
+      const list = result.d;
+
+      res.json({list:list});
+    }catch (error) {
+        console.error(error);
+      }
+});
+
+app.post('/getPlot', async (req, res) => {
+    const options = {
+        method: 'GET',
+        headers: {
+            'X-RapidAPI-Key': process.env.API_KEY,
+            'X-RapidAPI-Host': process.env.API_HOST
+        }
+    };
+    const id = req.body.id
+    const plotUrl = `https://imdb8.p.rapidapi.com/title/v2/get-plot?tconst=${id}`;//search for the plot using the id
+      const plotResponse = await fetch(plotUrl, options);//fetch the plot
+      const plotResult = await plotResponse.json();//get the results in json
+      const plot = plotResult.data.title.plot.plotText.plainText //get the plot of the movie
+      console.log("the plot of the movie is", plot)
+      res.json({plot:plot})
+})
+
 //Handles the post from upload
 app.post('/uploadMedia', (req, res) => {
     const uploadData = req.body
