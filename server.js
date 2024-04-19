@@ -10,17 +10,20 @@ const expressHbs = require('express-handlebars');
 
 dotenv.config({path: "./.env"});
 
-//Create an instance of express-handlebars with no default layout
+//Create an instance of express-handlebars with header.hbs as default layout
 const hbs = expressHbs.create({
     layoutsDir: path.join(__dirname, 'frontend'),
     defaultLayout: 'header',
     extname: '.hbs'
 });
 
+//Function that reduces titles that are to long
 hbs.handlebars.registerHelper('reduce', function (str) {
     if (str && str.length > 57) {
+        //returns a new string 57 characters long ending with "..."
         return str.substring(0, 57) + '...';
     } else {
+        //If the string isn't to long it's just returned in it's original form
         return str;
     }
 });
@@ -38,6 +41,7 @@ const db = mysql.createConnection({
     database: process.env.DATABASE
 });
 
+//Crates a database for the session
 const sessionStore = new MySQLStore({
     host: process.env.DATABASE_HOST,
     user: process.env.DATABASE_USER,
@@ -45,25 +49,24 @@ const sessionStore = new MySQLStore({
     database: process.env.DATABASE
 });
 
-// Import http module
+//Import http module
 const http = require('http');
 
-// Create a new server using the http module and attach the express app to it
+//Create a new server using the http module and attach the express app to it
 const server = http.createServer(app);
 
-// Import socket.io and attach the server to it
+//Import socket.io and attach the server to it
 const io = require('socket.io')(server);
 
-// Listen for connections from the client
+//Listen for connections from the client
 io.on('connection', (socket) => {
     console.log('New client connected');
-    // Handle socket events here
 });
 
 app.set('trust proxy', 1) // trust first proxy
 app.use(session({
     store: sessionStore,
-    secret: 'keyboard duck',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false }
@@ -175,12 +178,12 @@ app.post("/onlyDisplay", (req, res) => {
 
 //renders signUp
 app.get("/signUp", (req, res) => {
-    res.render("signUp");
+    res.render("signUp",{ layout: null });
 });
 
 //renders signIn
 app.get("/signIn", (req, res) => {
-    res.render("signIn");
+    res.render("signIn",{ layout: null });
 });
 
 //signs the user out
