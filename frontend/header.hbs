@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head><link rel="stylesheet" type="text/css" href="/styles.css"></head>
+<!--The header, contains title, Menu, Searchbar and Login/Registration-->
+<header id = header>
+    <div id ="title">
+    <a id="titleText" href="/">Ink&Frames</a>
+    </div>
+    <nav id="menu">
+        {{#if adminPermission}}
+        <a href="admin" class="admin">Admin</a>
+        {{/if}}
+    </nav>
+    <form id="search"action="/search" method="GET">
+        <input id="searchbar" type="text" name="query" placeholder="Search movies...">
+        <button type="submit"><i class="fas fa-search"></i></button>
+    </form>
+
+    <nav id="auth">
+<ul>
+  {{#if isAuthenticated}}
+    <li><a href="">{{user.Username}}</a></li>
+    <button id="signOut" onclick="signOutFunction()">Sign Out</button>
+
+  {{else}}
+    <li id="signIn"><a href="/signIn">Sign in</a></li>
+    <li id="signUp"><a href="/signUp">Sign up</a></li>
+  {{/if}}
+</ul>
+    </nav>
+</header>
+<body>
+    {{{body}}}
+</body>
+</html>

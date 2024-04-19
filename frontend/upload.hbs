@@ -10,30 +10,8 @@
     <script src="index.js"></script>
 </head>
 <body>
-    <!--The header, contains title, Menu, Searchbar and Login/Registration-->
-<header id = header>
-    <div id ="title">
-    <a id="titleText" href="/">Ink&Frames</a>
-    </div>
-        {{#if adminPermission}}
-        <a href="admin" class="admin">Admin</a>
-        {{/if}}
-        <form id="search"action="/search" method="GET">
-        <input id="searchbar" type="text" name="query" placeholder="Search movies...">
-        <button type="submit"><i class="fas fa-search"></i></button>
-    </form>
+<!--The header, contains title, Menu, Searchbar and Login/Registration-->
 
-    <nav id="auth">
-<ul>
-  {{#if isAuthenticated}}
-    <li><a href="">{{user.Username}}</a></li>
-  {{else}}
-    <li id="signIn"><a href="/signIn">Sign in</a></li>
-    <li id="signUp"><a href="/signUp">Sign up</a></li>
-  {{/if}}
-</ul>
-    </nav>
-</header>
 
 <form id="uploadSearch" action="/search">
     <input id="uploadSearchbar" type="text" name="query" placeholder="Search movies...">

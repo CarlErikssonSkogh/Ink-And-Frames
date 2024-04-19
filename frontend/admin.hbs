@@ -8,33 +8,6 @@
     <title>ADMIN</title>
 </head>
 <body style="margin:0;display: flex; justify-content:flex-start; align-items:center; flex-direction:column; height:100vh; background-image: linear-gradient(darkgray, gray,rgb(58, 58, 58), black);">
-    <header id = header>
-    <div id ="title">
-    <a id="titleText" href="/">Ink&Frames</a>
-    </div>
-    <nav id="menu">
-        {{#if adminPermission}}
-        <a href="admin.hbs" class="admin">Admin</a>
-        {{/if}}
-    </nav>
-    <form id="search"action="/search" method="GET">
-        <input id="searchbar" type="text" name="query" placeholder="Search movies...">
-        <button type="submit"><i class="fas fa-search"></i></button>
-    </form>
-
-    <nav id="auth">
-<ul>
-  {{#if isAuthenticated}}
-    <li><a href="">{{user.Username}}</a></li>
-    <button id="signOut" onclick="signOutFunction()">Sign Out</button>
-
-  {{else}}
-    <li id="signIn"><a href="/signIn">Sign in</a></li>
-    <li id="signUp"><a href="/signUp">Sign up</a></li>
-  {{/if}}
-</ul>
-    </nav>
-</header>
 
     <div class= "main">
         <!--Iterates thorugh each item in the mediaData array and displays the title and average rating of the media item-->
@@ -42,9 +15,9 @@
         <div id="media" class="clickable-media">
             <img id = "mediaImg" src="{{poster}}" alt="">
             <div id = "mediaInfoContainer">
-            <h1 id="mediaName">{{title}}</h1>
+            <h1 id="mediaName">{{truncate title}}</h1>
             <h1>
-                <img src="star.png" alt="">
+                <img src="images/star.png" alt="">
                 {{avgRating}}/10</h1>
             </div>
             <h1>{{tag}}</h1>

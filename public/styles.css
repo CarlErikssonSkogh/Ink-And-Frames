@@ -333,10 +333,10 @@ white-space: nowrap;
     margin: 1vh;
     color: white;
     font-size: 3vh;
-    display: flex;
-    flex-direction: row;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     width: 100%;
-    text-wrap: wrap;
 }
 
  #mediaInfoContainer h1 img{

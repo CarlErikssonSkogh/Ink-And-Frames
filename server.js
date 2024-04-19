@@ -10,20 +10,15 @@ const expressHbs = require('express-handlebars');
 
 dotenv.config({path: "./.env"});
 
+//Create an instance of express-handlebars with no default layout
 const hbs = expressHbs.create({
-    defaultLayout: undefined
-});
-
-hbs.handlebars.registerHelper('truncate', function (str) {
-    if (str && str.length > 18) {
-        return str.substring(0, 18) + '...';
-    } else {
-        return str;
-    }
+    layoutsDir: path.join(__dirname, 'frontend'),
+    defaultLayout: 'header',
+    extname: '.hbs'
 });
 
 hbs.handlebars.registerHelper('reduce', function (str) {
-    if (str && str.length > 30) {
+    if (str && str.length > 57) {
         return str.substring(0, 57) + '...';
     } else {
         return str;
@@ -102,6 +97,8 @@ app.get("/", (req, res) => {
     let onlyDisplay = req.session.onlyDisplay;
     let sortingType = "";
     let onlyDisplayMediaType = "";
+
+    //Handles the sorting
     if(sorting == "Rating"){
         sortingType = "ORDER BY AvgRating DESC";
     }else if(sorting=="Alphabetical"){
@@ -110,6 +107,7 @@ app.get("/", (req, res) => {
         sortingType = "ORDER BY numberOfRatings DESC";
     }
 
+    //Handles what media should be displayed
     if(onlyDisplay == "All"){
         onlyDisplayMediaType = ""
     } else if(onlyDisplay == "Movies"){
@@ -120,7 +118,8 @@ app.get("/", (req, res) => {
         onlyDisplayMediaType = "AND tag = 'Book'"
     }
 
-    //Query the database for all movies containing searchQuery (displays all movies if searchQuery is not defined)
+    //Query the database for all movies containing searchQuery (displays all movies if searchQuery is not defined), 
+    //also adds the sorting or only display if it is given, if it is not given it will just be an empty string and do nothing
     db.query(`SELECT * FROM media WHERE Title LIKE ? ${onlyDisplayMediaType} ${sortingType}`, [`%${searchQuery}%`], (error, result) => {
         if (error) {
             console.log(error);
@@ -150,6 +149,7 @@ app.get("/", (req, res) => {
     });
 });
 
+//gets the search
 app.get('/search', (req, res) => {
     //Get the search query from the session
     const query = req.query.query;
@@ -158,12 +158,14 @@ app.get('/search', (req, res) => {
     res.redirect('/');
 });
 
+//retrieve the post about how the media should be sorted
 app.post("/sortBy", (req, res) => {
     const sorting = req.body.sorting
     req.session.sorting = sorting;
     res.redirect('/');
 })
 
+//retrieves the post on what should be displayed
 app.post("/onlyDisplay", (req, res) => {
     const onlyDisplay = req.body.onlyDisplay
     req.session.onlyDisplay = onlyDisplay;
@@ -181,17 +183,36 @@ app.get("/signIn", (req, res) => {
     res.render("signIn");
 });
 
+//signs the user out
+app.get('/signOut', function(req, res){
+    //removes the user from the session
+    req.session.destroy(function(err) {
+      if(err) {
+        console.log(err);
+      } else {
+        console.log("Signed out");
+        //emits that the user has been removed from the session and logged out
+        io.emit('signOut', {message:"Signed out"});
+        res.redirect('/');
+      }
+    });
+  });
+
 //renders upload
 app.get("/upload", (req, res) => {
     const data = {}; // Replace this with the actual data
     res.render("upload", data);
 });
 
+//Handles the search from upload.hbs
 app.post('/uploadSearch', async (req, res) => {
+    //gets the search value
     const search = req.body.search
-    console.log("search",search)
-    console.log("the search sent to the backend is", `https://imdb8.p.rapidapi.com/auto-complete?q=${search}`)
+
+    //creates the url with the search value
     const url = `https://imdb8.p.rapidapi.com/auto-complete?q=${search}`;
+
+    //the options for the fetch, uses the API_KEY provided by rapid API
     const options = {
         method: 'GET',
         headers: {
@@ -201,17 +222,23 @@ app.post('/uploadSearch', async (req, res) => {
     };
     
     try {
+      //requests information to the API with the url created from the search value
       const response = await fetch(url, options);
       const result = await response.json();
+
+      //extracts the information that is wanted
       const list = result.d;
 
+      //sends the data back to the frontend to be handled
       res.json({list:list});
     }catch (error) {
         console.error(error);
       }
 });
 
+//handles the plot information
 app.post('/getPlot', async (req, res) => {
+    //the options for the fetch, uses the API_KEY provided by rapid API
     const options = {
         method: 'GET',
         headers: {
@@ -219,12 +246,18 @@ app.post('/getPlot', async (req, res) => {
             'X-RapidAPI-Host': process.env.API_HOST
         }
     };
+    //retrieves the value sent by the frontend (this is the id of a specific movie)
     const id = req.body.id
-    const plotUrl = `https://imdb8.p.rapidapi.com/title/v2/get-plot?tconst=${id}`;//search for the plot using the id
-      const plotResponse = await fetch(plotUrl, options);//fetch the plot
-      const plotResult = await plotResponse.json();//get the results in json
-      const plot = plotResult.data.title.plot.plotText.plainText //get the plot of the movie
-      console.log("the plot of the movie is", plot)
+
+    //creates a new url (get-plot) with the id of the media
+    const plotUrl = `https://imdb8.p.rapidapi.com/title/v2/get-plot?tconst=${id}`;
+    //fetch the plot
+      const plotResponse = await fetch(plotUrl, options);
+      //get the results in json
+      const plotResult = await plotResponse.json();
+      //get the plot of the movie in plain text
+      const plot = plotResult.data.title.plot.plotText.plainText;
+      //send it to the frontend
       res.json({plot:plot})
 })
 
@@ -232,11 +265,14 @@ app.post('/getPlot', async (req, res) => {
 app.post('/uploadMedia', (req, res) => {
     const uploadData = req.body
     req.session.uploadData = uploadData
+    //Selects MediaID from a specific title
     db.query(`SELECT MediaID FROM media WHERE Title = ?`, [uploadData.title], (error, result) => {
+        //Checks if it already exists
         if(result.length != 0){
             console.log("already exists")
             return res.redirect('/');
         }else{
+        //if it does not exist add it to the data base and redirect the user to the main page
         db.query('INSERT INTO media SET?', {Title: uploadData.title, Tag: uploadData.tag, Star: uploadData.stars, Year: uploadData.year, Poster: uploadData.poster, Plot: uploadData.plot }, (err, result) => {
             return res.redirect('/');
         })
@@ -245,35 +281,35 @@ app.post('/uploadMedia', (req, res) => {
 })
 /*Handles sign up */
 app.post("/signUp", (req, res) => {
-    //Variabel för hur ett korrekt lösenord ska se ut
+    //Variabel for how a correct password should look
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
-    //Variabel för hur korrekt email ska se ut
+    //Variabel for how a correct email should look
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     const{name, email, password, password_confirm} = req.body
 
-    //kollar om lösenordet är korrekt skrivet
+    //Tests the password
     if(!passwordRegex.test(password)){
         return res.render('signUp', {
             message: "Password must contain atleasy 8 characters, atleast one number and one letter"
         })
     }
 
-    //testar om den angivna emailen är korrekt
+    //Tests the email
     if (!emailRegex.test(email)){
         return res.render('signUp', {
             message: "Not a correct email"
         })
     }
 
-    //kollar om password är matchande
+    //Checks if password and password_confirm matches
     if (password != password_confirm){
         return res.render('signUp', {
             message: "Passwords do not match"
         })
     }
 
-    //Om inte alla fälten är i fyllda
+    //If all the fields are not filled
     if (!name || !email || !password || !password_confirm){
         return res.render('signUp', {
             message: "All fields are not filled out"
@@ -284,19 +320,19 @@ app.post("/signUp", (req, res) => {
         if(error){
             console.log(error)
         }
-        //Om == 0 så finns inte användaren
+        //If == 0 the user does not exist
         if( result.length != 0 ) {
             return res.render('signUp', {
                 message: "User alaredy exists"
             }) 
         } else{
 
-            //krypterar lösenordet
+            //Crypts the password
             cryptPassword(password, (err, hash)=>{
                 if(err){
                     console.log("An error occured")
                 }else{
-                //Lägger till användare med det krypterade lösenordet
+                //Adds users to the database with the crypted password
                 db.query('INSERT INTO users SET?', {Username: name, Email: email, Password: hash}, (err, result) => {
                     if(err) {
                         console.log(err)
@@ -320,14 +356,14 @@ app.post("/signIn", (req, res) => {
         if(error){
             console.log(error)
         }
-        // Om == 0 så finns inte användaren
+        //if == 0 the user does not exist
         if( result.length == 0 ) {
             return res.render('signIn', {
                 message: "Användaren finns ej"
             }) 
 
         } else {
-            //Vi kollar om lösenordet som är angivet matchar det i databasen
+            //If the given password matches the password in the database
             bcrypt.compare(password, result[0].Password, function(err, isMatch) {
                 if (isMatch) {
                     //password is valid
@@ -339,7 +375,7 @@ app.post("/signIn", (req, res) => {
                         req.session.admin.adminPermission = true;
                     }
                     console.log("admin",req.session.admin ? req.session.admin.adminPermission : 'No admin session');
-                    // Store user information in the session
+                    //Store user information in the session
                     req.session.user = result[0];
                     return res.redirect('/');
 
@@ -364,12 +400,12 @@ app.get("/media", (req, res) => {
     console.log("All data from mediaID",mediaItem)
     req.session.mediaItem = mediaItem; //Store mediaItem in the session
 
-
+    //Selects everything from ratings of a specific media
     db.query('SELECT PersonID, MediaID, Rating, Review from ratings WHERE MediaID = ?',[mediaItem.mediaID], async (error, result)=>{
-        if(error){http://localhost:4000/
+        if(error){
             console.log(error)
         }
-
+        //Maps all the rating data from a specific media
         ratingData = result.map(item => ({
             PersonID:item.PersonID,
             MediaID:item.MediaID,
@@ -377,6 +413,7 @@ app.get("/media", (req, res) => {
             Review:item.Review
         }));
 
+        //creates a variable with all the ratings on a specific media and the logged in user
         const ratingItem = ratingData.find(item => item.PersonID === req.session.user.PersonID);
         if (ratingItem == undefined){
             rated = false
@@ -388,47 +425,42 @@ app.get("/media", (req, res) => {
     });
 });
 
+//Handles the ratings from the frontend
 app.post("/rating" ,(req,res) =>{
 const rating=req.body.rating
 const mediaID= req.session.mediaItem.mediaID;
 const personID = req.session.user.PersonID;
-console.log("id",mediaID,"rating",rating);
+
+//selects data from a specific media posted by a specific user
 db.query('SELECT PersonID, MediaID FROM ratings WHERE PersonID = ? and MediaID = ?',[personID, mediaID], async (error, result) => {
-    console.log("dfslmdfalk",result.length)
     if(error){
         console.log(error)
     }
-    //If the ratings is a new rating (not a edited previous rating)
+    //If the ratings is a new rating (not a edited previous rating), inserts the rating
     if(result.length==0){
         db.query('INSERT INTO ratings (PersonID, MediaID, Rating) VALUES (?, ?, ?)', [personID, mediaID, rating], async (error, result) => {
             if(error){
                 console.log(error);
             }
+            //Emits that the rating was added
             io.emit('new rating added', {newRating:rating});
+            //calls a function to handle the calculations for AvgRating
             calculateAvgRating(mediaID, rating);
         });
     } else{
+        //If it's not a new ratings and instead just a updated rating, Updated the rating
         db.query('UPDATE ratings SET Rating = ? WHERE PersonID = ? AND MediaID = ?', [rating, personID, mediaID], async (error, result) => {
             if(error){
                 console.log(error);
             }
+            //calls a function to handle the calculations for AvgRatings
             calculateAvgRating(mediaID, rating);
         });
     }
 })
 })
 
-app.get('/signOut', function(req, res){
-    req.session.destroy(function(err) {
-      if(err) {
-        console.log(err);
-      } else {
-        console.log("Signed out");
-        io.emit('signOut', {message:"Signed out"});
-        res.redirect('/');
-      }
-    });
-  });
+
 
 server.listen(4000, ()=> {
     console.log("Servern körs, besök http://localhost:4000")
@@ -470,26 +502,28 @@ function calculateAvgRating(mediaID, rating) {
 //renders admin
 app.get("/admin", function(req, res){
     db.query('SELECT * from ratings',async (error, result)=>{
-        const allRatingData = result.map(item => ({
-            personID: item.PersonID,
-            mediaID: item.MediaID,
-            rating: item.Rating
-        }));
-    res.render("admin" ,{mediaData:mediaData, allRatingData:allRatingData});
+    //renders admin.hbs with the nessecary data
+    res.render("admin" ,{mediaData:mediaData});
     });
 });
 
+//Handles the removal of media in admin.hbs
 app.post("/admin", function(req, res){
+    //gets the media name of the clicked media in admin.hbs
     const mediaName = req.body.mediaName
-    console.log(mediaName)
+    //gets the all the information about the specific media
     const mediaItem = mediaData.find(item => item.title === mediaName);
     const mediaItemID=mediaItem.mediaID
+
+    //Deletes all the ratings made on the media
     db.query("DELETE FROM ratings WHERE MediaID = ?", [mediaItemID], (error, result) => {
         if (error) {
             console.log(error);
             res.status(500).send("Error deleting data from database");
         }
     });
+
+    //When all the ratings are removed the media itself can be safely removed
     db.query("DELETE FROM media WHERE MediaID = ?", [mediaItemID], (error, result) =>{
         if (error) {
             console.log(error);
