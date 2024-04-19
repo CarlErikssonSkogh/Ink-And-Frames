@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', (event) => {
     const mediaDivs = document.querySelectorAll('.clickable-media');
+    //Adds a click event to all the clickable media divs
     mediaDivs.forEach(div => {
         div.addEventListener('click', function() {
+          //Gets the title of the clicked media
             const mediaName = this.querySelector('#mediaName').textContent;
+            //If the user is logged in they are transported to media.hbs
             if(isAuthenticated){
             window.location.href = '/media?name=' + encodeURIComponent(mediaName);
         }else{
@@ -11,8 +14,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
         });
     });
 });
+
 //Toggles the dropdown menu
 function dropdownFunction(e) {
+  //Close the dropdown menu if the user clicks outside of it
     e.stopPropagation();
     document.getElementById("myDropdown").classList.toggle("show");
 }
@@ -20,8 +25,10 @@ function dropdownFunction(e) {
 //Function to add click events to the sorting options
 document.addEventListener('DOMContentLoaded', (event) => {
     const sortLi = document.querySelectorAll("#sortBy li");
+    //Adds click event to all the sortLi elements
     sortLi.forEach(li => {
         li.addEventListener('click', function(){
+          //gets the text content of the sortLi that was clicked
             const sorting = li.textContent;
             const options = {
                 method: 'POST',
@@ -30,10 +37,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 },
                 body: JSON.stringify({sorting:sorting})
               };
-              
+              //Sends the text content of the sortLi that was clicked to the server
               fetch('/sortBy', options)
                 .then(response => {
                   if (response.ok) {
+                    //If the response was successfull, reload the page to apply the changes
                     location.reload();
                   } else {
                     throw new Error('Failed to send data');
@@ -161,7 +169,6 @@ try{
       const year = item.y;
       const id = item.id
 
-
       const uploadResults = document.createElement('div');
       uploadResults.innerHTML = `<h3>${title}</h3><img src="${poster}" alt="poster" width="100" height="100">`;
       uploadResults.style.cursor = 'pointer';
@@ -197,8 +204,10 @@ try{
         })
         .catch(error => console.error('Error:', error));
       });
+      
       document.querySelector('.uploadMedia').appendChild(uploadResults);
-  })
+    }
+)
 }catch(error){
   console.error('Error:', error);
 }
