@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
               fetch('/sortBy', options)
                 .then(response => {
                   if (response.ok) {
-                    //If the response was successfull, reload the page to apply the changes
+                    //If the response was successful, reload the page to apply the changes
                     location.reload();
                   } else {
                     throw new Error('Failed to send data');
@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const onlyDisplayLi = document.querySelectorAll("#onlyDisplay li");
     onlyDisplayLi.forEach(li => {
         li.addEventListener('click', function(){
+          //Gets the textcontent (what the media should be filtered by)
             const onlyDisplay = li.textContent;
             const options = {
                 method: 'POST',
@@ -68,6 +69,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
               fetch('/onlyDisplay', options)
                 .then(response => {
                   if (response.ok) {
+                    //If the response was successful, reload the page to apply the changes
                     location.reload();
                   } else {
                     throw new Error('Failed to send data');
@@ -80,10 +82,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
 function ratingFunction() {
 //Close the dropdown menu if the user clicks outside of it
 window.onclick = function(event) {
+  //If the user clicked outside of the dropdown button, close the window
     if (!event.target.matches('.dropbtn')) {
       var dropdowns = document.getElementsByClassName("dropdown-content");
-      var i;
-      for (i = 0; i < dropdowns.length; i++) {
+      for (var i = 0; i < dropdowns.length; i++) {
         var openDropdown = dropdowns[i];
         if (openDropdown.classList.contains('show')) {
           openDropdown.classList.remove('show');
