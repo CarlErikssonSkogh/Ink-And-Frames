@@ -87,6 +87,7 @@ window.onclick = function(event) {
       var dropdowns = document.getElementsByClassName("dropdown-content");
       for (var i = 0; i < dropdowns.length; i++) {
         var openDropdown = dropdowns[i];
+        //If the dropdown is open, close it
         if (openDropdown.classList.contains('show')) {
           openDropdown.classList.remove('show');
         }
@@ -94,8 +95,10 @@ window.onclick = function(event) {
     }
   }
 
+//selects all the dropdown elements
 document.addEventListener('DOMContentLoaded', (event) => {
     const ratingLi = document.querySelectorAll('#myDropdown li');
+    //Loops through them and adds click event to all of them
     ratingLi.forEach(li => {
         li.addEventListener('click',function(){
             const options = {
@@ -105,7 +108,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 },
                 body: JSON.stringify({rating:li.textContent}) 
               };
-              
+              //Sends the text content of the clicked rating li to the server
               fetch('/rating', options)
                 .then(response => {
                   if (response.ok) {
@@ -119,11 +122,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
 });
 }
 
+//Function to handle the sign out button
 function signOutFunction(){
     fetch('/signOut')
     .then(response => {
         if (response.ok) {
-            location.reload();
+          window.location.href = "/";
         } else {
             console.error('Sign out failed');
         }
@@ -133,11 +137,12 @@ function signOutFunction(){
     });
 }
 
-//gets the search value from the searchbar
+//gets the search value from the upload searchbar
 window.onload = function() {
   document.getElementById('/uploadSearch').addEventListener('submit', function(event) {
       event.preventDefault();
       var searchValue = document.getElementById('uploadSearchbar').value;
+      //Calls the upload media function with the searchValue
       uploadMedia(searchValue);
   });
 }
@@ -152,17 +157,20 @@ async function uploadMedia(search){
       body: JSON.stringify({search}) 
     };
 try{
+  //Sends the search to the server
   const response = await fetch('/uploadSearch', searchOption)
   if (!response.ok){
     throw new Error('Failed to send data');
   }
+  //Waits for a response
   const data = await response.json();
+  //Converts the response to a list
   const mediaList = data.list;
   console.log("you searched for",search);
   document.querySelector('.uploadMedia').innerHTML = "";
 
   
-  
+  //Maps through the list and creates all the needed variables
   mediaList.map(async (item) => {
       const title=item.l;
       const poster = item.i.imageUrl;
@@ -171,7 +179,9 @@ try{
       const year = item.y;
       const id = item.id
 
+      //Creates a div for every iteration
       const uploadResults = document.createElement('div');
+      //Adds the title and poster to the divs
       uploadResults.innerHTML = `<h3>${title}</h3><img src="${poster}" alt="poster" width="100" height="100">`;
       uploadResults.style.cursor = 'pointer';
 
@@ -185,11 +195,12 @@ try{
             body: JSON.stringify({id}) 
           };
 
+          //Requests the plot of the clicked media from the server
           const plotResponse = await fetch('/getPlot', plotOption)
           const plotData = await plotResponse.json();
           const plot = plotData.plot
 
-          //post all the correct information about the clicked media to the server    
+          //Post all the correct information about the clicked media to the server    
           const postOptions = {
             method: 'POST',
             headers: {
@@ -198,6 +209,7 @@ try{
             body: JSON.stringify({title,poster,tag,stars,year,plot}) 
           };
 
+          //Sends all the relevant data from the clicked media to the server to be added to the database
           fetch('/uploadMedia', postOptions)
           .then(response => {
             if (response.redirected) {
@@ -207,6 +219,7 @@ try{
         .catch(error => console.error('Error:', error));
       });
       
+      //Appends the div to the document
       document.querySelector('.uploadMedia').appendChild(uploadResults);
     }
 )

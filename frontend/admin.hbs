@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/styles.css">
     <script src="admin.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     <title>ADMIN</title>
 </head>
 <body style="margin:0;display: flex; justify-content:flex-start; align-items:center; flex-direction:column; height:100vh; background-image: linear-gradient(darkgray, gray,rgb(58, 58, 58), black);">
@@ -15,7 +16,7 @@
         <div id="media" class="clickable-media">
             <img id = "mediaImg" src="{{poster}}" alt="">
             <div id = "mediaInfoContainer">
-            <h1 id="mediaName">{{title}}</h1>
+            <h2 id="mediaName">{{title}}</h2>
             <h1>
                 <img src="images/star.png" alt="">
                 {{avgRating}}/10</h1>

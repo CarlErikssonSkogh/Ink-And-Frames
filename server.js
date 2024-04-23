@@ -8,6 +8,8 @@ var session = require('express-session')
 const MySQLStore = require('express-mysql-session')(session);
 const expressHbs = require('express-handlebars');
 
+
+
 dotenv.config({path: "./.env"});
 
 //Create an instance of express-handlebars with header.hbs as default layout
