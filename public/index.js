@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             if(isAuthenticated){
             window.location.href = '/media?name=' + encodeURIComponent(mediaName);
         }else{
-            alert("You need to be signed in to view this page")
+          window.location.href = '/signIn'
         }
         });
     });

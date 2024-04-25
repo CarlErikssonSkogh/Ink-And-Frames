@@ -123,6 +123,8 @@ height: 100%;
     list-style: none;
  }
 
+
+
  #auth li a:hover{
 background-color: #333;
  }
@@ -403,6 +405,11 @@ align-self: flex-end;
     flex-direction: column;
 }
 
+#authForm div input{
+width: 30vw;
+font-size: 2vh;
+}
+
 .message{
     position:absolute;
     top: 30vh;
@@ -413,6 +420,12 @@ align-self: flex-end;
     width: 25vw;
     height: 3vh;
     background-color: rgb(255, 0, 0);
+}
+
+.noAccount{
+    background-color: white;
+    color: rgb(0, 0, 0);
+    font-size: 2vh;
 }
 
 

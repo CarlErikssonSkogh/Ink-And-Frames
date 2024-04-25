@@ -180,12 +180,12 @@ app.post("/onlyDisplay", (req, res) => {
 
 //renders signUp
 app.get("/signUp", (req, res) => {
-    res.render("signUp",{ layout: null });
+    res.render("signUp");
 });
 
 //renders signIn
 app.get("/signIn", (req, res) => {
-    res.render("signIn",{ layout: null });
+    res.render("signIn");
 });
 
 //signs the user out
@@ -296,7 +296,7 @@ app.post("/signUp", (req, res) => {
     //Tests the password
     if(!passwordRegex.test(password)){
         return res.render('signUp', {
-            message: "Password must contain atleasy 8 characters, atleast one number and one letter"
+            message: "Password must contain atleast 8 characters, atleast one number and one letter"
         })
     }
 
@@ -398,10 +398,16 @@ let rated = false
 let ratingData = []
 //renders media
 app.get("/media", (req, res) => {
+    if (!res.locals.isAuthenticated){
+        return res.redirect('/signIn');
+    }
     //retrieves mediaName variable from the url
     const mediaName = req.query.name;
     //Filter the mediaData array for the media with the given mediaName
     const mediaItem = mediaData.find(item => item.title === mediaName);
+    if (!mediaItem) {
+        res.redirect("/")
+    }
     console.log("All data from mediaID",mediaItem)
     req.session.mediaItem = mediaItem; //Store mediaItem in the session
 

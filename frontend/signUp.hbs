@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
      <link rel="stylesheet" type="text/css" href="/styles.css">
     <title>Login/Register</title>
 </head>
-<body style="display: flex; justify-content:center; align-items:center; height:100vh;">
+<body style="overflow: hidden;">
     <div class="authCon">
         <form id="authForm" action="signUp" method="POST" onsubmit="return password_check('submit')">
             {{#if message }}
@@ -21,12 +22,12 @@
                     </div>
                     <div class="mb-3">
                         <!--kallar password_check varje gång en knapp släpps-->
-                        <input type="password" class="form-control" id="password-reg" name="password" onkeyup="password_check()"  placeholder="Password" required>
+                        <input type="password" class="form-control" id="password-reg" name="password" onkeyup="password_check()"  placeholder="Password (atleast 8 characters, one number and one letter)" required>
                     </div>
                     <div class="mb-3">
                         <input type="password" class="form-control" id="password-conf-reg" name="password_confirm" onkeyup="password_check()" placeholder="Confirm password" required>
                     </div>
-
+                
                     <button type="submit" class="btn btn-primary">Sign up</button>
                 </form>
     </div>
